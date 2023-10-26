@@ -33,7 +33,7 @@ def identifier_couleur(valeur):
         return (255, 255, 255)  # Blanc (couleur par défaut si la valeur n'est pas reconnue)
 
 # Chargez un fichier CSV de votre choix
-csv_filename = "sapin.csv"
+csv_filename = "bulbi.csv"
 
 # Lire le fichier CSV
 with open(csv_filename, newline='') as csvfile:

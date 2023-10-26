@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = "UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="manifest" href="static/manifest.json">
+
+</head> 
+<body style="text-align: center; align-items: center; height: 100vh;">
+<div id="document" style="display: grid; grid-template-columns: 1fr 7fr; grid-template-rows: 1fr 15fr;">
+    <div id="sidebar" style="display: grid; grid-column: 0; grid-row-start: 0; grid-row-end: 1; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr;">
+        <image src="./favicon.ico"></image>
+    </div>
+    <div id="navbar" style="display: grid; grid-column: 1; grid-row: 0; grid-template-columns: 1f 1fr 1fr; grid-template-rows: 1fr;">
+        <button id="editeur_button" style="grid-column: 0;">Editeur</button>
+        <button id="bibliotheque_button" style="grid-column: 1;">Bibliothèque</button>
+        <button id="support_button" style="grid-column: 2;">Aidez-nous</button>
+    </div>
+    <div id="main" style="display: grid; grid-column: 1; grid-row: 1; grid-template-columns: 1fr; grid-template-rows: 1fr;">
+        <h1> MagiMaticArt </h1>
+        <h3 id="main_desc"></h3>
+    </div>
+</div>
+</body>
+</html>
