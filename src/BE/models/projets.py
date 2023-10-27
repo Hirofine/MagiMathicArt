@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from app.config.database import Base
+from config.db import Base
 
 # Modèle SQLAlchemy pour la table "Projets"
-class Projet(Base):
+class Projets(Base):
     __tablename__ = "Projets"
 
     id = Column(Integer, primary_key=True, index=True)

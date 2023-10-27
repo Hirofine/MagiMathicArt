@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String
-from app.config.database import Base
+from config.db import Base
 
 # Modèle SQLAlchemy pour la table "Couleurs"
-class Couleur(Base):
+class Couleurs(Base):
     __tablename__ = "Couleurs"
 
     id = Column(Integer, primary_key=True, index=True)

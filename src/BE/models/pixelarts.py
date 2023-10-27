@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text
-from app.config.database import Base
+from config.db import Base
 
 # Modèle SQLAlchemy pour la table "PixelArts"
-class PixelArt(Base):
+class PixelArts(Base):
     __tablename__ = "PixelArts"
 
     id = Column(Integer, primary_key=True, index=True)

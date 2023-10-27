@@ -2,7 +2,7 @@
 CREATE TABLE Users (
   id INT PRIMARY KEY,
   pseudo VARCHAR(255) NOT NULL,
-  pass VARCHAR(255) NOT NULL,
+  passw VARCHAR(255) NOT NULL,
   -- Autres colonnes d'utilisateur
 );
 

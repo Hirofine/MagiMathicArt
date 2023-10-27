@@ -1,16 +1,20 @@
-from pydantic import BaseModel
+from typing import Union
 
-class AssoBase(BaseModel):
+from fastapi import FastAPI
+from routes.index import user
+from fastapi.middleware.cors import CORSMiddleware
 
 
-class AssoCreate(AssoBase):
-    pass
+app = FastAPI()
 
-class AssoUpdate(AssoBase):
-    pass
+app.include_router(user)
 
-class Asso(AssoBase):
-    id: int
 
-    class Config:
-        orm_mode = True
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost/"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+
+)

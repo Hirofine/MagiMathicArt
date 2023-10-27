@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey
-from app.config.database import Base
+from config.db import Base
 
 # Modèle SQLAlchemy pour la table d'association "AssoProjetReponse"
 class AssoProjetReponse(Base):

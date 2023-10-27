@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from .couleurs import Couleur, CouleurBase, CouleurCreate, CouleurUpdate
 
 class PaletteBase(BaseModel):
     nom: str

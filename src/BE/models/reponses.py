@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text
-from app.config.database import Base
+from config.db import Base
 
 # Modèle SQLAlchemy pour la table "Reponses"
-class Reponse(Base):
+class Reponses(Base):
     __tablename__ = "Reponses"
 
     id = Column(Integer, primary_key=True, index=True)

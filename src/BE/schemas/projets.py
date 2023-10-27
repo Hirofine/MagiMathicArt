@@ -1,15 +1,18 @@
 from pydantic import BaseModel
 
-class CouleurBase(BaseModel):
-    color: str
+class ProjetBase(BaseModel):
+    id: int
+    nom: str
+    description: str
+    user_id: int
 
-class CouleurCreate(CouleurBase):
+class ProjetCreate(ProjetBase):
     pass
 
-class CouleurUpdate(CouleurBase):
+class ProjetUpdate(ProjetBase):
     pass
 
-class Couleur(CouleurBase):
+class Projet(ProjetBase):
     id: int
 
     class Config:
