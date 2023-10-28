@@ -7,6 +7,6 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     pseudo = Column(String, unique=True, index=True)
-    password = Column(String)
+    passw = Column(String)
     # Autres colonnes d'utilisateur, ajoutez-les ici si nécessaire
 

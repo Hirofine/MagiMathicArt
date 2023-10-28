@@ -32,5 +32,6 @@ def rt_delete_user(user_id: int, db: Session = Depends(get_db)):
     success = delete_user(db, user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
+    return None
 
 # Vous pouvez ajouter d'autres routes liées aux utilisateurs au besoin

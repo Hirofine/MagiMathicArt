@@ -16,4 +16,8 @@ def update_user(db: Session, user_id, user_data):
 
 # Fonction spécifique pour supprimer un utilisateur par ID
 def delete_user(db: Session, user_id):
-    crud.delete(db, Users, user_id)
+    try:
+        crud.delete(db, Users, user_id)
+        return True  # Indique que l'utilisateur a été supprimé
+    except:
+        return False  # Indique que l'utilisateur n'a pas été trouvé

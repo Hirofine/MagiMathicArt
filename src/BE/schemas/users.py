@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 class UserBase(BaseModel):
     pseudo: str
+    passw: str
 
 class UserCreate(UserBase):
     pass

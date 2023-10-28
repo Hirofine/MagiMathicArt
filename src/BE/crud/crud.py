@@ -1,8 +1,5 @@
 from sqlalchemy.orm import Session
-from models.index import Users, Projets, Palettes, Couleurs, Images, PixelArts, Reponses
-from models.index import AssoPaletteCouleur, AssoProjetImage, AssoProjetPalette, AssoProjetPaletteReponse
-from models.index import AssoProjetPixelArt, AssoProjetReponse, AssoUserImage, AssoUserPalette
-from models.index import AssoUserPixelArt, AssoUserProjet, AssoUserReponse  # Importez ici tous vos modèles
+from models.index import Users
 
 # Fonction générique pour créer un enregistrement
 def create(db: Session, model, data):
@@ -18,9 +15,15 @@ def read(db: Session, model, id):
 
 # Fonction générique pour mettre à jour un enregistrement par ID
 def update(db: Session, model, id, data):
-    db.query(model).filter(model.id == id).update(data)
-    db.commit()
-    return read(db, model, id)
+    record = db.query(model).filter(model.id == id).first()
+    if record:
+        for key, value in data.dict().items():
+            setattr(record, key, value)
+        db.commit()
+        db.refresh(record)
+        return record
+    return None
+
 
 # Fonction générique pour supprimer un enregistrement par ID
 def delete(db: Session, model, id):

@@ -1,9 +1,8 @@
 -- Table des Utilisateurs
 CREATE TABLE Users (
-  id INT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   pseudo VARCHAR(255) NOT NULL,
-  passw VARCHAR(255) NOT NULL,
-  -- Autres colonnes d'utilisateur
+  passw VARCHAR(255) NOT NULL
 );
 
 -- Table des Projets
