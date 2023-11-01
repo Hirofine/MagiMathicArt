@@ -4,7 +4,6 @@ from .couleurs import Couleur, CouleurBase, CouleurCreate, CouleurUpdate
 
 class PaletteBase(BaseModel):
     nom: str
-    couleurs: List[CouleurCreate]
 
 class PaletteCreate(PaletteBase):
     pass

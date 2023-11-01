@@ -7,11 +7,9 @@ CREATE TABLE Users (
 
 -- Table des Projets
 CREATE TABLE Projets (
-  id INT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
-  description TEXT,
-  user_id INT,
-  FOREIGN KEY (user_id) REFERENCES Users(id)
+  description TEXT
   -- Autres colonnes de projet
 );
 
@@ -30,7 +28,7 @@ CREATE TABLE Palettes (
 
 -- Table des Images
 CREATE TABLE Images (
-  id INT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   description TEXT,
   image BLOB
@@ -39,7 +37,7 @@ CREATE TABLE Images (
 
 -- Table des Pixel Arts
 CREATE TABLE PixelArts (
-  id INT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   description TEXT,
   dimensionsX INT,
@@ -50,7 +48,7 @@ CREATE TABLE PixelArts (
 
 -- Table des Réponses
 CREATE TABLE Reponses (
-  id INT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   description TEXT,
   fonction TEXT -- Stockez ici les fonctions ou données de réponse
