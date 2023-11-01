@@ -1,7 +1,7 @@
 from typing import Union
 
 from fastapi import FastAPI
-from routes.index import user, projet, couleur, palette, image
+from routes.index import user, projet, couleur, palette, image, pixelart, reponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -12,6 +12,8 @@ app.include_router(projet)
 app.include_router(couleur)
 app.include_router(palette)
 app.include_router(image)
+app.include_router(pixelart)
+app.include_router(reponse)
 
 
 app.add_middleware(
