@@ -5,5 +5,6 @@ from config.db import Base
 class AssoUserPalette(Base):
     __tablename__ = "AssoUserPalette"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    palette_id = Column(Integer, ForeignKey("palettes.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    palette_id = Column(Integer, ForeignKey("Palettes.id"))

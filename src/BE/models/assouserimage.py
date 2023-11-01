@@ -5,5 +5,6 @@ from config.db import Base
 class AssoUserImage(Base):
     __tablename__ = "AssoUserImage"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    image_id = Column(Integer, ForeignKey("images.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    image_id = Column(Integer, ForeignKey("Images.id"))

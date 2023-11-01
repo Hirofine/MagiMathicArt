@@ -5,5 +5,6 @@ from config.db import Base
 class AssoProjetPalette(Base):
     __tablename__ = "AssoProjetPalette"
 
-    projet_id = Column(Integer, ForeignKey("projets.id"), primary_key=True)
-    palette_id = Column(Integer, ForeignKey("palettes.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    projet_id = Column(Integer, ForeignKey("Projets.id"))
+    palette_id = Column(Integer, ForeignKey("Palettes.id"))

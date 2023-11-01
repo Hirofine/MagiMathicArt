@@ -57,21 +57,23 @@ CREATE TABLE Reponses (
 
 -- Table d'Association entre Palette et Couleur
 CREATE TABLE AssoPaletteCouleur (
-    palette_id INT,
-    couleur_id INT,
-    position INT,
-    PRIMARY KEY (palette_id, couleur_id),
-    FOREIGN KEY (palette_id) REFERENCES Palettes(id),
-    FOREIGN KEY (couleur_id) REFERENCES Couleurs(id)
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  palette_id INT,
+  couleur_id INT,
+  position INT,
+  UNIQUE (palette_id, couleur_id),
+  FOREIGN KEY (palette_id) REFERENCES Palettes(id),
+  FOREIGN KEY (couleur_id) REFERENCES Couleurs(id)
 );
 
 -- Table d'Association entre Palette et Reponse pour un projet donné
 CREATE TABLE AssoProjetPaletteReponse (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     projet_id INT,
     palette_id INT,
     reponse_id INT,
     position INT,
-    PRIMARY KEY (projet_id, palette_id, reponse_id),
+    UNIQUE (projet_id, palette_id, reponse_id),
     FOREIGN KEY (projet_id) REFERENCES Projets(id),
     FOREIGN KEY (palette_id) REFERENCES Palettes(id),
     FOREIGN KEY (reponse_id) REFERENCES Reponses(id)
@@ -79,6 +81,7 @@ CREATE TABLE AssoProjetPaletteReponse (
 
 -- Table d'Association entre Projets et Images
 CREATE TABLE AssoProjetImage (
+  id INT AUTO_INCREMENT PRIMARY KEY,
   projet_id INT,
   image_id INT,
   coordX INT,
@@ -86,77 +89,85 @@ CREATE TABLE AssoProjetImage (
   opacite INT,
   dimX INT,
   dimY INT,
-  PRIMARY KEY (projet_id, image_id),
+  UNIQUE (projet_id, image_id),
   FOREIGN KEY (projet_id) REFERENCES Projets(id),
   FOREIGN KEY (image_id) REFERENCES Images(id)
 );
 
 -- Table d'Association entre Projets et Réponses
 CREATE TABLE AssoProjetReponse (
+  id INT AUTO_INCREMENT PRIMARY KEY,
   projet_id INT,
   reponse_id INT,
-  PRIMARY KEY (projet_id, reponse_id),
+  UNIQUE (projet_id, reponse_id),
   FOREIGN KEY (projet_id) REFERENCES Projets(id),
   FOREIGN KEY (reponse_id) REFERENCES Reponses(id)
 );
 
 -- Table d'Association entre Projet et Palette
 CREATE TABLE AssoProjetPalette (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     projet_id INT,
     palette_id INT,
-    PRIMARY KEY (projet_id, palette_id),
+    UNIQUE (projet_id, palette_id),
     FOREIGN KEY (projet_id) REFERENCES Projets(id),
     FOREIGN KEY (palette_id) REFERENCES Palettes(id)
 );
 
 -- Table d'Association entre Projets et PixelArts
 CREATE TABLE AssoProjetPixelArt (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     projet_id INT,
     pixelart_id INT,
-    PRIMARY KEY (projet_id, pixelart_id),
+    UNIQUE (projet_id, pixelart_id),
     FOREIGN KEY (projet_id) REFERENCES Projets(id),
     FOREIGN KEY (pixelart_id) REFERENCES PixelArts(id)
 );
 
 -- Table d'Association entre Users et Projets
 CREATE TABLE AssoUserProjet (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     projet_id INT,
-    PRIMARY KEY (user_id, projet_id),
+    UNIQUE (user_id, projet_id),
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (projet_id) REFERENCES Projets(id)
 );
 
 -- Table d'Association entre Users et Palettes
 CREATE TABLE AssoUserPalette (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     palette_id INT,
-    PRIMARY KEY (user_id, palette_id),
+    UNIQUE (user_id, palette_id),
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (palette_id) REFERENCES Palettes(id)
 );
 
 -- Table d'Association entre Users et Images
 CREATE TABLE AssoUserImage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     image_id INT,
-    PRIMARY KEY (user_id, image_id),
+    UNIQUE (user_id, image_id),
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (image_id) REFERENCES Images(id)
 );
 
 CREATE TABLE AssoUserReponse(
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     reponse_id INT,
-    PRIMARY KEY (user_id, reponse_id),
+    UNIQUE (user_id, reponse_id),
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (reponse_id) REFERENCES Reponses(id)
 );
 
 CREATE TABLE AssoUserPixelArt(
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     pixelart_id INT,
-    PRIMARY KEY (user_id, pixelart_id),
+    UNIQUE (user_id, pixelart_id),
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (pixelart_id) REFERENCES PixelArts(id)
 );

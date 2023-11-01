@@ -5,3 +5,14 @@ from .palettes import Palette, PaletteCreate, PaletteUpdate
 from .images import Image, ImageCreate, ImageUpdate
 from .pixelarts import PixelArt, PixelArtCreate, PixelArtUpdate
 from .reponses import Reponse, ReponseCreate, ReponseUpdate
+from .assopalettecouleur import AssoPaletteCouleur, AssoPaletteCouleurCreate, AssoPaletteCouleurUpdate
+from .assoprojetpalettereponse import AssoProjetPaletteReponse, AssoProjetPaletteReponseCreate, AssoProjetPaletteReponseUpdate
+from .assoprojetimage import AssoProjetImage, AssoProjetImageCreate, AssoProjetImageUpdate
+from .assoprojetreponse import AssoProjetReponse, AssoProjetReponseCreate, AssoProjetReponseUpdate
+from .assoprojetpalette import AssoProjetPalette, AssoProjetPaletteCreate, AssoProjetPaletteUpdate
+from .assoprojetpixelart import AssoProjetPixelArt, AssoProjetPixelArtCreate, AssoProjetPixelArtUpdate
+from .assouserprojet import AssoUserProjet, AssoUserProjetCreate, AssoUserProjetUpdate
+from .assouserpalette import AssoUserPalette, AssoUserPaletteCreate, AssoUserPaletteUpdate
+from .assouserimage import AssoUserImage, AssoUserImageCreate, AssoUserImageUpdate
+from .assouserreponse import AssoUserReponse, AssoUserReponseCreate, AssoUserReponseUpdate
+from .assouserpixelart import AssoUserPixelArt, AssoUserPixelArtCreate, AssoUserPixelArtUpdate

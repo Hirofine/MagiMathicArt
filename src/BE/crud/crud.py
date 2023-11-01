@@ -1,5 +1,9 @@
 from sqlalchemy.orm import Session
 from models.index import Users, Projets, Couleurs, Palettes, Images, PixelArts
+from models.index import AssoPaletteCouleur, AssoProjetPaletteReponse, AssoProjetImage
+from models.index import AssoProjetReponse, AssoProjetPalette, AssoProjetPixelArt
+from models.index import AssoUserProjet, AssoUserPalette, AssoUserImage
+from models.index import AssoUserReponse, AssoUserPixelArt
 
 # Fonction générique pour créer un enregistrement
 def create(db: Session, model, data):

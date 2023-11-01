@@ -5,5 +5,6 @@ from config.db import Base
 class AssoUserReponse(Base):
     __tablename__ = "AssoUserReponse"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    reponse_id = Column(Integer, ForeignKey("reponses.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    reponse_id = Column(Integer, ForeignKey("Reponses.id"))

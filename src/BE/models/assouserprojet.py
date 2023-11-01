@@ -5,5 +5,6 @@ from config.db import Base
 class AssoUserProjet(Base):
     __tablename__ = "AssoUserProjet"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    projet_id = Column(Integer, ForeignKey("projets.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    projet_id = Column(Integer, ForeignKey("Projets.id"))

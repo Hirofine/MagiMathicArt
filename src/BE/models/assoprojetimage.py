@@ -5,8 +5,9 @@ from config.db import Base
 class AssoProjetImage(Base):
     __tablename__ = "AssoProjetImage"
 
-    projet_id = Column(Integer, ForeignKey("projets.id"), primary_key=True)
-    image_id = Column(Integer, ForeignKey("images.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    projet_id = Column(Integer, ForeignKey("Projets.id"))
+    image_id = Column(Integer, ForeignKey("Images.id"))
     coordX = Column(Integer)
     coordY = Column(Integer)
     opacite = Column(Integer)

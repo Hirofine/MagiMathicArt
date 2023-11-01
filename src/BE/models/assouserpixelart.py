@@ -5,5 +5,6 @@ from config.db import Base
 class AssoUserPixelArt(Base):
     __tablename__ = "AssoUserPixelArt"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    pixelart_id = Column(Integer, ForeignKey("pixelarts.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    pixelart_id = Column(Integer, ForeignKey("PixelArts.id"))

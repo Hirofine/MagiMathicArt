@@ -5,3 +5,14 @@ from .palettes import palette
 from .images import image
 from .pixelarts import pixelart
 from .reponses import reponse
+from .assopalettecouleur import assopalettecouleur
+from .assoprojetpalettereponse import assoprojetpalettereponse
+from .assoprojetimage import assoprojetimage
+from .assoprojetreponse import assoprojetreponse
+from .assoprojetpalette import assoprojetpalette
+from .assoprojetpixelart import assoprojetpixelart
+from .assouserprojet import assouserprojet
+from .assouserpalette import assouserpalette
+from .assouserimage import assouserimage
+from .assouserreponse import assouserreponse
+from .assouserpixelart import assouserpixelart
