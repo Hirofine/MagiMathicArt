@@ -1,7 +1,11 @@
 import bcrypt
-
+import secrets
+from datetime import datetime, timedelta
+from starlette.responses import JSONResponse
+from starlette.requests import Request
 from config.db import get_db, Session
 from sqlalchemy import text, or_
+from sqlalchemy.exc import SQLAlchemyError
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query
 from fastapi.responses import StreamingResponse
 from models.index import Users
@@ -13,6 +17,11 @@ class PseudoAvailabilityResponse:
         self.available = available
         self.message = message
 
+class LoginResponse:
+    def __init__(self, success: bool, message: str):
+        self.success = success
+        self.message = message
+
 user = APIRouter()
 
 @user.post("/users/", response_model=User)
@@ -20,13 +29,52 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
     return create_user(db, user_data)
 
-@user.post("/register/", response_model=User)
+@user.post("/register/")
 def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
+    
     password = user_data["passw"]
     hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     user_data["passw"] = hash
-    return create_user(db, user_data)
+
+    token = secrets.token_bytes(32)
+    tokenExpi = datetime.now() + timedelta(hours=1)
+    tokenSalt = bcrypt.gensalt()
+
+    token_salted = token + tokenSalt
+    hashed_token = bcrypt.hashpw(token_salted, bcrypt.gensalt())
+
+    user_data["token"] = hashed_token
+    user_data["tokenExpi"] = tokenExpi
+    user_data["tokenSalt"] = tokenSalt
+    try :
+        new_user = create_user(db, user_data)
+    except SQLAlchemyError as e:
+        print(f"User creation failed due to database Error: {e}")
+        return JSONResponse(content={"message": f"User creation failed due to database Error: {e}"})
+    except Exception as e:
+        print(f"User creation failed: {e}")
+        return JSONResponse(content={"message": f"User creation failed: {e}"})
+    response = JSONResponse(content={"message": "Connexion réussie"})
+    response.set_cookie("session", token, secure=True, httponly=True, max_age=3600)
+    print("test")
+    return response
+
+@user.post("/login/")
+def login(user: UserCreate, db: Session = Depends(get_db)):
+    user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
+    password = user_data["passw"]
+    user_db = db.query(Users).filter(Users.pseudo == user_data["pseudo"]).first()
+    db.close()
+    if user_db:
+        if bcrypt.checkpw(password.encode("utf-8"), user_db.passw.encode("utf-8")):
+            response_data = LoginResponse(success= True, message = "Connexion réussie")
+        else :
+            response_data = LoginResponse(success = False, message = "Mot de Passe invalide")
+    else :
+        response_data = LoginResponse(success = False, message = "Cet Utilisateur n'existe pas")
+    
+    return response_data
 
 
 @user.get("/check-pseudo/")

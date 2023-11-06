@@ -2,7 +2,10 @@
 CREATE TABLE Users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   pseudo VARCHAR(255) NOT NULL,
-  passw VARCHAR(255) NOT NULL
+  passw VARCHAR(255) NOT NULL,
+  token VARCHAR(255),
+  tokenExpi DATETIME,
+  tokenSalt VARCHAR(255)
 );
 
 -- Table des Projets
