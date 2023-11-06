@@ -38,6 +38,16 @@ async def get_favicon():
 async def read_root():
     with open(path.join("static", "index.html"), "r") as f:
         return HTMLResponse(content=f.read())
+
+@app.get("/account_creation")
+async def read_root():
+    with open(path.join("static", "pages/account_creation.html"), "r") as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/account_login")
+async def read_root():
+    with open(path.join("static", "pages/account_login.html"), "r") as f:
+        return HTMLResponse(content=f.read())
     
 if __name__ == "__main__":
     import uvicorn

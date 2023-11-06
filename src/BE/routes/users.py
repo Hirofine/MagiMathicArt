@@ -1,10 +1,17 @@
+import bcrypt
+
 from config.db import get_db, Session
 from sqlalchemy import text, or_
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query
 from fastapi.responses import StreamingResponse
 from models.index import Users
 from schemas.index import User, UserCreate, UserUpdate
 from crud.users import create_user, get_user, update_user, delete_user  # Importez les fonctions spécifiques
+
+class PseudoAvailabilityResponse:
+    def __init__(self, available: bool, message: str):
+        self.available = available
+        self.message = message
 
 user = APIRouter()
 
@@ -13,6 +20,25 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
     return create_user(db, user_data)
 
+@user.post("/register/", response_model=User)
+def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
+    user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
+    password = user_data["passw"]
+    hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    user_data["passw"] = hash
+    return create_user(db, user_data)
+
+
+@user.get("/check-pseudo/")
+def check_pseudo(pseudo: str = Query(..., min_length=1), db: Session = Depends(get_db)):
+    user = db.query(Users).filter(Users.pseudo == pseudo).first()
+    db.close()
+    if user:
+        response_data = PseudoAvailabilityResponse(available = False, message = "Pseudo déjà pris")
+    else :
+        response_data = PseudoAvailabilityResponse(available = True, message = "Pseudo disponible")
+    return response_data
+ 
 @user.get("/users/{user_id}", response_model=User)
 def rt_read_user(user_id: int, db: Session = Depends(get_db)):
     user = get_user(db, user_id)
