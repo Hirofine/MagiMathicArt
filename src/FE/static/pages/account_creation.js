@@ -1,4 +1,4 @@
-var api_url = "http://localhost:8000"
+var api_url = "https://be.magimathicart.hirofine.fr"
 
 document.addEventListener("DOMContentLoaded", function () {
     // Sélectionnez les éléments du formulaire
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pseudo = usernameInput.value;
 
         // Envoyer une requête au serveur pour vérifier la disponibilité du pseudo
-        fetch(api_url + `/check-pseudo?pseudo=${pseudo}`)
+        fetch(api_url + `/check-pseudo/?pseudo=${pseudo}`)
             .then(response => response.json())
             .then(data => {
                 if (data.available) {
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             passw: passw
         };
 
-        fetch(api_url + "/register", {
+        fetch(api_url + "/register/", {
             method: "POST",
             body: JSON.stringify(userData),
             headers: {
@@ -62,11 +62,32 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             // Gérez la réponse du serveur backend (par exemple, affichez un message de réussite ou d'erreur)
+            // Utilisation :
+            const sessionToken = getCookie('session');
+
+            if (sessionToken) {
+                // Le cookie session_token existe, vous pouvez effectuer des opérations avec le token.
+                console.log(`Session Token: ${sessionToken}`);
+            } else {
+                // Le cookie session_token n'existe pas.
+                console.log("Le cookie de session n'a pas été trouvé.");
+            }
         })
         .catch(error => {
+            console.log(error)
             // Gérez les erreurs (par exemple, problème de connectivité avec le serveur)
         });
     }
     });
 });
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+}
+

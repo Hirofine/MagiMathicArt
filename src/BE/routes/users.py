@@ -1,13 +1,14 @@
 import bcrypt
 import secrets
 from datetime import datetime, timedelta
-from starlette.responses import JSONResponse
+import binascii
+#from starlette.responses import JSONResponse
 from starlette.requests import Request
 from config.db import get_db, Session
 from sqlalchemy import text, or_
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from models.index import Users
 from schemas.index import User, UserCreate, UserUpdate
 from crud.users import create_user, get_user, update_user, delete_user  # Importez les fonctions spécifiques
@@ -38,6 +39,8 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     user_data["passw"] = hash
 
     token = secrets.token_bytes(32)
+    token_char = binascii.hexlify(token).decode()
+    print(token)
     tokenExpi = datetime.now() + timedelta(hours=1)
     tokenSalt = bcrypt.gensalt()
 
@@ -56,8 +59,8 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
         print(f"User creation failed: {e}")
         return JSONResponse(content={"message": f"User creation failed: {e}"})
     response = JSONResponse(content={"message": "Connexion réussie"})
-    response.set_cookie("session", token, secure=True, httponly=True, max_age=3600)
-    print("test")
+    response.set_cookie("session", token_char, secure=True, httponly=False, max_age=7200, domain="hirofine.fr", samesite="None", path="/")
+    print(response.raw_headers)
     return response
 
 @user.post("/login/")

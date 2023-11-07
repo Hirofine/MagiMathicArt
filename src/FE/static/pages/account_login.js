@@ -1,4 +1,4 @@
-var api_url = "http://localhost:8000"
+var api_url = "https://be.magimathicart.hirofine.fr"
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");

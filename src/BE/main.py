@@ -35,8 +35,8 @@ app.include_router(assouserpixelart)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000/"],
-    allow_credentials=False,
+    allow_origins=["https://magimathicart.hirofine.fr", "https://be.magimathicart.hirofine.fr"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 
