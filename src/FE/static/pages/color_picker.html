@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Color Picker</title>
+    <style>
+        .slider-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider-container">
+        <input type="range" min="0" max="255" value="0" class="slider" id="slider1">
+        <input type="range" min="0" max="255" value="0" class="slider" id="slider2">
+        <input type="range" min="0" max="255" value="0" class="slider" id="slider3">
+    </div>
+    <div id="color-box" style="width: 100px; height: 100px; background-color: rgb(0, 0, 0);"></div>
+    <button id="select-color">Selectionner</button>
+    <script src="../static/pages/color_picker.js"></script>
+</body>
+</html>
+

@@ -49,6 +49,21 @@ async def read_root():
     with open(path.join("static", "pages/account_login.html"), "r") as f:
         return HTMLResponse(content=f.read())
     
+@app.get("/my_account")
+async def read_root():
+    with open(path.join("static", "pages/my_account.html"), "r") as f:
+        return HTMLResponse(content=f.read())
+    
+@app.get("/color_picker")
+async def read_root():
+    with open(path.join("static", "pages/color_picker.html"), "r") as f:
+        return HTMLResponse(content=f.read())
+    
+@app.get("/palette_editor")
+async def read_root():
+    with open(path.join("static", "pages/palette_editor.html"), "r") as f:
+        return HTMLResponse(content=f.read())
+    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7801)

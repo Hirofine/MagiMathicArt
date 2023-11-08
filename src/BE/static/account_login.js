@@ -2,38 +2,45 @@ var api_url = "https://be.magimathicart.hirofine.fr"
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");
+    const usernameInput = document.getElementById("name-input");
+    const passwordInput = document.getElementById("password-input");
+    const submit_button = document.getElementById("submit-button");
+
     form.addEventListener("submit", function (event) {
-        event.preventDefault(); // Empêcher la soumission du formulaire par défaut
+        event.preventDefault(); // Empêchez la soumission du formulaire par défaut
 
-        // Récupérer les valeurs du pseudo et du mot de passe
-        const pseudo = document.getElementById("name-input").value;
-        const password = document.getElementById("password-input").value;
+        // Récupérez les données du formulaire
+        const pseudo = usernameInput.value;
+        const passw = passwordInput.value;
 
+     
         const userData = {
             pseudo: pseudo,
-            passw: password
+            passw: passw
         };
 
-        // Envoyer une requête au serveur pour vérifier l'authentification
-        fetch(api_url + "/login", {
+        fetch(api_url + "/login/", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
             body: JSON.stringify(userData),
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Rediriger l'utilisateur vers la page de tableau de bord ou une autre page
-                    window.location.href = "/";
-                } else {
-                    // Afficher un message d'erreur
-                    alert("Échec de la connexion. Veuillez vérifier vos informations.");
-                }
-            })
-            .catch(error => {
-                console.error("Erreur de connexion : " + error);
-            });
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data["message"] == "Connexion réussie"){
+                window.location.href = "https://magimathicart.hirofine.fr";
+            }else{
+                console.log("c'est la merder");
+            }
+            
+            
+        })
+        .catch(error => {
+            console.log(error)
+            // Gérez les erreurs (par exemple, problème de connectivité avec le serveur)
+        });
+    
     });
 });

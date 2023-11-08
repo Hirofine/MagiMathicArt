@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Creation</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="../static/style.css">
     <link rel="manifest" href="static/manifest.json">
 </head>
 <body>
     <h1>THIS WEBSITE IS VERY MUCH UNDER CONSTRUCTION, DO NOT ENTER ANY PERSONNAL DATA, NOTHING IS STORED SECURELY!!</h1>
     <form>
-        <label id="name-label" for="name-input">Pseudo</label>
-        <input id="name-input" type="text">
+        <label for="name-input">Pseudo</label>
+        <input type="text" id="name-input" name="username">
+        <label for="password-input">Mot de passe</label>
+        <input type="password" id="password-input" name="password">
         
-        <label id="password-label" for="password-input">Passe</label>
-        <input id="password-input" type="password">
-        <button type="submit">Connexion</button>
+        
+        <button type="submit" id="submit-button">Connexion</button>
     </form>
     <h3>Pas de compte? <li><a href="account_creation">Création de Compte</a></li></h3>
 </body>
-<script src="./static/account_login.js"></script>
+<script src="../static/account_login.js"></script>
 </html>
