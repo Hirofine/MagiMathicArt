@@ -62,18 +62,14 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data)
-            // Gérez la réponse du serveur backend (par exemple, affichez un message de réussite ou d'erreur)
-            // Utilisation :
-            const sessionToken = getCookie('session');
-
-            if (sessionToken) {
-                // Le cookie session_token existe, vous pouvez effectuer des opérations avec le token.
-                console.log(`Session Token: ${sessionToken}`);
-            } else {
-                // Le cookie session_token n'existe pas.
-                console.log("Le cookie de session n'a pas été trouvé.");
+            console.log(data);
+            if (data["message"] == "Connexion réussie"){
+                window.location.href = "https://magimathicart.hirofine.fr";
+            }else{
+                console.log("c'est la merder");
             }
+            
+            
         })
         .catch(error => {
             console.log(error)
@@ -83,11 +79,4 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        return parts.pop().split(';').shift();
-    }
-}
 

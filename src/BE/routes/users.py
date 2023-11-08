@@ -3,12 +3,11 @@ import secrets
 from datetime import datetime, timedelta
 import binascii
 #from starlette.responses import JSONResponse
-from starlette.requests import Request
 from config.db import get_db, Session
 from sqlalchemy import text, or_
 from sqlalchemy.exc import SQLAlchemyError
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query, Request
+from fastapi.responses import StreamingResponse, JSONResponse, RedirectResponse
 from models.index import Users
 from schemas.index import User, UserCreate, UserUpdate
 from crud.users import create_user, get_user, update_user, delete_user  # Importez les fonctions spécifiques
@@ -31,7 +30,7 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user(db, user_data)
 
 @user.post("/register/")
-def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
+def rt_create_user(user: UserCreate,  request: Request, db: Session = Depends(get_db)):
     user_data = dict(user)  # Convertit l'objet UserCreate en dictionnaire
     
     password = user_data["passw"]
@@ -47,6 +46,8 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     token_salted = token + tokenSalt
     hashed_token = bcrypt.hashpw(token_salted, bcrypt.gensalt())
 
+    
+
     user_data["token"] = hashed_token
     user_data["tokenExpi"] = tokenExpi
     user_data["tokenSalt"] = tokenSalt
@@ -58,10 +59,28 @@ def rt_create_user(user: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"User creation failed: {e}")
         return JSONResponse(content={"message": f"User creation failed: {e}"})
+    
+    cookie_content = {
+        "id" : new_user.id,
+        "pseudo" : new_user.pseudo,
+        "token": token_char
+    }
+
     response = JSONResponse(content={"message": "Connexion réussie"})
-    response.set_cookie("session", token_char, secure=True, httponly=False, max_age=7200, domain="hirofine.fr", samesite="None", path="/")
+    response.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=36000, domain="hirofine.fr", samesite="None", path="/")
     print(response.raw_headers)
+    
     return response
+
+@user.get("/verify-session/")
+def verify_session(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("session")
+    print(token)
+    if not token:
+        return JSONResponse(content={"message": "Session non valide", "data" : False})
+    
+    
+    return JSONResponse(content={"message": "Session non valide", "data" : False})
 
 @user.post("/login/")
 def login(user: UserCreate, db: Session = Depends(get_db)):

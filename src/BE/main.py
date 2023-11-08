@@ -6,6 +6,8 @@ from routes.index import assopalettecouleur, assoprojetpalettereponse, assoproje
 from routes.index import assoprojetreponse, assoprojetpalette, assoprojetpixelart
 from routes.index import assouserprojet, assouserpalette, assouserimage, assouserreponse, assouserpixelart
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 
 app = FastAPI()
@@ -32,6 +34,15 @@ app.include_router(assouserimage)
 app.include_router(assouserreponse)
 app.include_router(assouserpixelart)
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/register/")
+def get_register_page():
+    return FileResponse("static/account_creation.html")
+
+@app.get("/login/")
+def get_login_page():
+    return FileResponse("static/account_login.html")
 
 app.add_middleware(
     CORSMiddleware,
