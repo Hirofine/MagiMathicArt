@@ -4,13 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
 from fastapi.responses import StreamingResponse
 from models.index import Couleurs
 from schemas.index import Couleur, CouleurCreate, CouleurUpdate
-from crud.couleurs import create_couleur, get_couleur, update_couleur, delete_couleur  # Importez les fonctions spécifiques
+from crud.couleurs import create_couleur, get_couleur, update_couleur, delete_couleur, get_couleur_from_code  # Importez les fonctions spécifiques
 
 couleur = APIRouter()
 
 @couleur.post("/couleurs/", response_model=Couleur)
 def rt_create_couleur(couleur: CouleurCreate, db: Session = Depends(get_db)):
+    print(couleur)
     couleur_data = dict(couleur)  # Convertit l'objet CouleurCreate en dictionnaire
+    print(couleur_data)
     return create_couleur(db, couleur_data)
 
 @couleur.get("/couleurs/{couleur_id}", response_model=Couleur)
@@ -33,3 +35,12 @@ def rt_delete_couleur(couleur_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Couleur not found")
     return None
+
+
+@couleur.get("/couleurs_code/{color_code}", response_model=Couleur)
+def rt_find_couleur(color_code: str, db: Session = Depends(get_db)):
+    print(color_code)
+    couleur = get_couleur_from_code(db, color_code)
+    if couleur is None:
+        raise HTTPException(status_code=404, detail="Couleur not found")
+    return couleur

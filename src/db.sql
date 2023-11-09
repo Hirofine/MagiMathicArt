@@ -19,7 +19,7 @@ CREATE TABLE Projets (
 -- Table des Couleurs
 CREATE TABLE Couleurs (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    color VARCHAR(7) NOT NULL -- Code hexadécimal de la couleur
+    color VARCHAR(7) UNIQUE NOT NULL -- Code hexadécimal de la couleur
 );
 
 -- Table des Palettes

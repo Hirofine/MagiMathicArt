@@ -12,6 +12,13 @@
             width: 50px;
             height: 50px;
             display: inline-block;
+            border: 1px solid #808080;
+        }
+
+        .selected {
+            width: 60px;
+            height: 60px;
+            border: 2px solid black; /* ou n'importe quel style de bordure que vous préférez */
         }
 
         .slider-container {
@@ -23,21 +30,22 @@
         .slider {
             width: 100%;
         }
+
     </style>
 </head>
 <body>
     <h1>Editeur de palette</h1>
     <input id="name-input" placeholder="Nom de la Palette">
 
-    <div id="palette-display">
+    <div id="palette-display" style="border: 2px solid gray">
 
     </div>
 
     <div id="edit_size">
         <button id="add-color">Ajouter</button>
-        <button id="delete-color">Supprimer</button>
+        
     </div>
-    <div id="color_editor" style="display: none;">
+    <div id="color-editor-div" style="display: none;">
         <div class="slider-container">
             <input type="range" min="0" max="255" value="0" class="slider" id="slider1">
             <input type="range" min="0" max="255" value="0" class="slider" id="slider2">
@@ -45,8 +53,11 @@
         </div>
         <div id="color-box" style="width: 100px; height: 100px; background-color: rgb(0, 0, 0);"></div>
         <button id="validate-color">OK</button>
+        <button id="delete-color">Supprimer</button>
     </div>
-
+    <div>
+        <button id="save-palette">Sauvegarder</button>
+    </div>
     <script src="../static/pages/palette_editor.js"></script>
 </body>
 </html>

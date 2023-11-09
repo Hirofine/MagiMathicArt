@@ -11,6 +11,6 @@ class CouleurUpdate(CouleurBase):
 
 class Couleur(CouleurBase):
     id: int
-
+    
     class Config:
         orm_mode = True

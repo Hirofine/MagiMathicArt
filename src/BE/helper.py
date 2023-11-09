@@ -47,3 +47,9 @@ def verify_token(request: Request, db: Session):
             return TOKEN_VALIDE   #token valide    
         return TOKEN_EXPIRE    #token expiré
     return TOKEN_INVALIDE    #token non valide / token non existant
+
+def user_id_from_token(request: Request, db: Session):
+    session = request.cookies.get("session")
+    session = json.loads(session.replace("'", "\""))
+    user_id = session["id"]
+    return user_id

@@ -10,6 +10,9 @@ def create_couleur(db: Session, couleur_data):
 def get_couleur(db: Session, couleur_id):
     return crud.read(db, Couleurs, couleur_id)
 
+def get_couleur_from_code(db: Session, color_code):
+    return db.query(Couleurs).filter(Couleurs.color == color_code).first()
+
 # Fonction spécifique pour mettre à jour un utilisateur par ID
 def update_couleur(db: Session, couleur_id, couleur_data):
     return crud.update(db, Couleurs, couleur_id, couleur_data)
