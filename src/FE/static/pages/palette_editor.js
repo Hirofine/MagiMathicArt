@@ -9,21 +9,32 @@ const deleteButton = document.getElementById("delete-color");
 const saveButton = document.getElementById("save-palette");
 const name_input = document.getElementById("name-input");
 var colors = [];
+var paletteName = "";
 
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez le conteneur du tableau  
     //determine mode
-    mode = "new"
+    var queryString = window.location.search;
+    var params = new URLSearchParams(queryString);
+
+    var mode = params.get("mode");
+    var id = params.get("id");
     //mode new
     if(mode == "new"){
-        colors = [[0,"#ff736e"], [1,"#d30256"], [2,"#d3fa56"],[3,"#da02e6"],[4,"#d1c556"]]; //[[0, "#FFFFFF"]];
+        colors = [[0, "#FFFFFF"]];
+        refresh_colors();
     }
     if(mode == "test"){
         colors =[[0,"#ff736e"], [1,"#d30256"], [2,"#d3fa56"],[3,"#da02e6"],[4,"#d1c556"]];
+        refresh_colors();
+    }
+    if(mode == "edit"){
+        display_palette(id);
+        
     }
 
     //display les couleurs déjà présente
-    refresh_colors();
+    
 
 
     // Créez un tableau de couleurs
@@ -31,6 +42,44 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Parcourez le tableau de couleurs et créez des cases carrées
 });
+
+async function display_palette(id){
+    palette = await get_palette(id);
+    console.log(palette);
+    colors_data = palette["couleurs"];
+    colors = [];
+    colors_data.forEach((col, i) => {
+        colors[i] = [col.position, col.color]; 
+    })
+    console.log(colors);
+    paletteName = palette["nom"];
+    name_input.value = paletteName;
+    refresh_colors();
+}
+
+async function get_palette(id){
+    try {
+        const response = await fetch(api_url + `/palette_full/` + id, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("data :", data);
+        const palette = data;
+        console.log("p1 : ", palette);
+        return palette;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+
+    
+}
 
 function add_color(color){
     colors.push([colors.length, color]);
@@ -146,10 +195,18 @@ saveButton.onclick = () => {
             break;
         case "new":
             create_new_palette();
+
+            break;
+        case "edit":
+            save_palette();
             break;
         default:
             break;
     }
+}
+
+function save_palette(){
+    
 }
 
 function create_new_palette(){
