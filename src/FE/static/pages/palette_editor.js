@@ -10,6 +10,8 @@ const saveButton = document.getElementById("save-palette");
 const name_input = document.getElementById("name-input");
 var colors = [];
 var paletteName = "";
+var id = 0;
+var mode ="new";
 
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez le conteneur du tableau  
@@ -17,8 +19,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var queryString = window.location.search;
     var params = new URLSearchParams(queryString);
 
-    var mode = params.get("mode");
-    var id = params.get("id");
+    mode = params.get("mode");
+    id = params.get("id");
     //mode new
     if(mode == "new"){
         colors = [[0, "#FFFFFF"]];
@@ -132,7 +134,7 @@ selectButton.addEventListener("click", function() {
 
 function selectColor(){
     const selectedSquare = document.querySelector('.square.selected');
-    id= selectedSquare.id.split('-')[1];
+    var id = selectedSquare.id.split('-')[1];
     couleur = rgbToHex(colorBox.style.backgroundColor);
     colors[id][1] = couleur;
     refresh_colors();
@@ -206,7 +208,38 @@ saveButton.onclick = () => {
 }
 
 function save_palette(){
+    console.log("id : ", id);
+    couleurs_data = [];
+    for (var i=0; i<colors.length; i++){
+        couleurs_data[i] = { color: colors[i][1], position: i }
+    }
+    var data = {
+        nom: name_input.value,
+        couleurs: couleurs_data
+    };
     
+
+    console.log(JSON.stringify(data));
+    // Configuration de la requête
+    var requestOptions = {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    
+    // Effectuer la requête
+    fetch(api_url + "/palettes_full/" + id, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Réponse de l\'API:', data);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la requête:', error);
+        });
 }
 
 function create_new_palette(){

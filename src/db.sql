@@ -64,7 +64,7 @@ CREATE TABLE AssoPaletteCouleur (
   palette_id INT,
   couleur_id INT,
   position INT,
-  UNIQUE (palette_id, couleur_id),
+  UNIQUE (palette_id, couleur_id, position),
   FOREIGN KEY (palette_id) REFERENCES Palettes(id),
   FOREIGN KEY (couleur_id) REFERENCES Couleurs(id)
 );
