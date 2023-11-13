@@ -5,10 +5,20 @@ var palettes = [];
 const palette_div = document.getElementById("Palettes");
 const projet_div = document.getElementById("Projets");
 var is_connected = false;
-const projet_name_input = document.getElementById("projet-name_input");
-const palette_name_input = document.getElementById("palette-name-input")
+const projet_name_input = document.getElementById("projet-name-input");
+var palette_name_input = document.getElementById("palette-name-input")
 const colorTable = document.getElementById("palette-display");
-const pixelArt = document.getElementById("pixelArt-div");
+const pixelArt_div = document.getElementById("pixelArt-div");
+
+const dimX_input = document.getElementById("dimX-input");
+const dimY_input = document.getElementById("dimY-input");
+const valider_dimension_button = document.getElementById("validate-dimensions")
+const save_button = document.getElementById("sauvegarder-button");
+
+var dimX;
+var dimY;
+
+var pixart = [];
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("loaded page");
@@ -28,6 +38,34 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 });
 
+
+valider_dimension_button.addEventListener("click", function(){
+    resize_pixel_art(dimX_input.value, dimY_input.value);
+    
+});
+
+save_button.addEventListener("click", function(){
+    save_projet();
+})
+
+function resize_pixel_art(new_dimX, new_dimY){
+    console.log("resize to ", new_dimX, " by ", new_dimY);
+    var new_pix = []
+    for (var x=0; x<new_dimX; x++){
+        new_pix[x] = [];
+        for (var y=0; y<new_dimY; y++){
+            if (x < dimX && y < dimY){
+                new_pix[x][y] = pixart[x][y];
+            }else{
+                new_pix[x][y] = "#ffffff";
+            }
+            
+        }
+    }
+    pixart = new_pix;
+    display_pixelart_square();
+}
+
 async function update_page(is_connected){
     switch(is_connected){
         case true:
@@ -43,6 +81,7 @@ async function update_page(is_connected){
                 
             }
             if(mode == "edit"){
+                a = await update_palette_selector();
                 projet = await retrieve_user_projets(id);
                 display_existing(projet);
                 
@@ -61,32 +100,41 @@ async function update_page(is_connected){
        }
 }
 
+async function update_palette_selector(){
+    pals = await retrieve_palette_user();
+    palettes = pals["palettes"];
+    palettes.forEach(function(palette){
+        var opt = document.createElement("option");
+        opt.value = palette["id"];
+        opt.innerHTML = palette["nom"];
+        palette_name_input.appendChild(opt);
+    });
+    return 1;
+}
+
 async function display_existing(projet){
     console.log(projet);
     projet_name_input.value = projet["nom"];
-    palette = await retrieve_palette_projet(projet.id);
+    var palette = await retrieve_palette_projet(projet.id);
+    console.log(palette);
+    palette_name_input.value = palette["id"];
     display_palette(palette);
     console.log(palette);
-    pixelart = await retrieve_pixel_art_projet(projet.id);
+    var pixelart = await retrieve_pixel_art_projet(projet.id);
     console.log(pixelart);
     display_pixelart(pixelart, palette);
 }
 
-function display_pixelart(pixelart, palette){
-    art = JSON.parse(pixelart["art"]);
-    format = art["format"];
-    console.log(format);
-    if (format == "square"){
-        display_pixelart_square(pixelart, palette)
-    }
-}
-
-function display_pixelart_square(pixelart, palette){
+function load_pixel_art(pixelart, palette){
     dimX = pixelart["dimensionsX"];
     dimY = pixelart["dimensionsY"];
+
+    dimX_input.value = dimX;
+    dimY_input.value = dimY;
+
     console.log(dimX, dimY);
     pixels = JSON.parse(pixelart["art"])["pixels"];
-    var pixart = [];
+    pixart = [];
     console.log(pixels);
     for (var x=0; x<dimX; x++){
         pixart[x] = [];
@@ -94,9 +142,31 @@ function display_pixelart_square(pixelart, palette){
         
         for (var y=0; y<dimY; y++){
             pixart[x][y] = palette["couleurs"][pixels[x * dimY + y][2]].color;
+        }
+    }
+}
+
+function display_pixelart(pixelart, palette){
+    
+    art = JSON.parse(pixelart["art"]);
+    format = art["format"];
+    console.log(format);
+    load_pixel_art(pixelart, palette);
+    if (format == "square"){
+        display_pixelart_square()
+    }
+}
+
+function display_pixelart_square(){
+    dimX = dimX_input.value;
+    dimY = dimY_input.value;
+    pixelArt_div.innerHTML = "";
+    for (var x=0; x<dimX; x++){
+        const line = document.createElement("div")
+        for (var y=0; y<dimY; y++){
             draw_pixel(pixart[x][y],x,y, line);
         }
-        pixelArt.appendChild(line);
+        pixelArt_div.appendChild(line);
     }
     console.log(pixart);
 }
@@ -108,10 +178,20 @@ function draw_pixel(color,x,y, line) {
     pix.style.backgroundColor = color;
     pix.id = "pixel-" + x + "-" + y;
     line.appendChild(pix);
-    pix.onclick = (event) => {
+    pix.onmousemove = (event) => {
         //pix.style.backgroundColor = 0;
-        console.log("clicked ", pix.id, " my color is ", pix.style.backgroundColor);
+        console.log("mousemove");
+        if(event.buttons === 1){
+            console.log("clicked ", pix.id, " my color is ", pix.style.backgroundColor);
+            change_color(x,y, pix);
+        }
     }
+}
+
+function change_color(x,y, pix){
+    color = document.querySelector('.square.selected');
+    pix.style.backgroundColor = color.style.backgroundColor;
+    console.log("change color ", pix, color);
 }
 
 function display_palette(palette){
@@ -122,7 +202,6 @@ function display_palette(palette){
     })
     console.log(colors);
     paletteName = palette["nom"];
-    palette_name_input.value = paletteName;
     refresh_colors();
 }
 
@@ -183,6 +262,24 @@ async function retrieve_palette_projet(projet_id){
     }
 }
 
+async function retrieve_palette_user(projet_id){
+    try {
+        const response = await fetch(api_url + '/palette_from_user/', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
+
 async function retrieve_pixel_art_projet(projet_id){
     try {
         const response = await fetch(api_url + `/pixelart_from_projet/` + id, {
@@ -198,4 +295,8 @@ async function retrieve_pixel_art_projet(projet_id){
         console.error("Erreur lors de la vérification du pseudo : " + error);
         return []; // Retourne une liste vide en cas d'erreur
     }
+}
+
+function save_projet(){
+
 }

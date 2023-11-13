@@ -57,13 +57,36 @@
         
     </aside>
     <main>
-        <input id="projet-name_input" type="text">
-        <input id="palette-name-input" type="text">
+        <ul>
+            <li> 
+                <label for="projet-name-input">Nom</label>
+                <input id="projet-name-input" type="text">
+            </li>
+            <li>
+                <label for="palette-name-input">Palette</label>
+                <select  id="palette-name-input"></select>
+            </li>
+            <ul>
+                <li>
+                    <label for="dimX-input">Taille Verticale</label>
+                    <input id="dimX-input" type="number">
+                </li>
+                <li>
+                    <label for="dimY-input">Taille Horizontale</label>
+                    <input id="dimY-input" type="number">
+                </li>
+                <li>
+                    <button id="validate-dimensions">Valider</button>
+                </li>
+            </ul>
+        </ul>   
+
         <div id="palette-display" style="border: 2px solid gray">
 
         </div>
         <div id="pixelArt-div" style="border: 2px solid gray;">
         </div>
+        <button id="sauvegarder-button">Sauvegarder</button>
     </main>
 </body>
 <script src="../static/pages/editeur.js"></script>

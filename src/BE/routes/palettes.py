@@ -27,6 +27,11 @@ class PaletteCreateFull(BaseModel):
     nom: str
     couleurs: List[CouleurPosi]
 
+class PaletteReturnFull(BaseModel):
+    nom: str
+    couleurs: List[CouleurPosi]
+    id: int
+
 
 @palette.post("/palettes/", response_model=Palette)
 def rt_create_palette(palette: PaletteCreateFull, request: Request, db: Session = Depends(get_db)):
@@ -123,7 +128,7 @@ def rt_read_palette_full(projet_id: int, request: Request, db: Session = Depends
             coul = db.query(Couleurs).filter(Couleurs.id == asso.couleur_id).first()
             couleurs.append(CouleurPosi(color = coul.color, position = asso.position))
         
-        new_palette = PaletteCreateFull(nom = palette.nom, couleurs = couleurs)
+        new_palette = PaletteReturnFull(nom = palette.nom, couleurs = couleurs, id=palette_id)
         return new_palette
     else :
         raise HTTPException(status_code=404, detail="Palette not found")
