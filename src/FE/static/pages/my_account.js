@@ -35,6 +35,12 @@ async function update_page(is_connected){
             palettes.forEach(function(palette){
                 display_palette(palette);
             });
+            var new_palette_button = document.createElement("button");
+            new_palette_button.innerHTML = "Nouvelle Palette";
+            new_palette_button.addEventListener("click", function(){
+                window.location.href = "./palette_editor?mode=new&id=0";
+            })
+            palette_div.appendChild(new_palette_button)
             console.log("case true");
             break;
         case false:

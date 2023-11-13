@@ -270,6 +270,8 @@ function create_new_palette(){
         .then(response => response.json())
         .then(data => {
             console.log('Réponse de l\'API:', data);
+            palette_id = data.id;
+            window.location.href = "./palette_editor?mode=edit&id=" + palette.id
         })
         .catch(error => {
             console.error('Erreur lors de la requête:', error);

@@ -143,7 +143,7 @@ def rt_create_palette(palette_id: int, palette: PaletteCreateFull, request: Requ
                     if couleur != None:
                         couleur_id = couleur.id
                     else:
-                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color)))
+                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color))).id
 
                     asso = db.query(AssoPaletteCouleur).filter(palette_id == AssoPaletteCouleur.palette_id, color.position == AssoPaletteCouleur.position).first()
                     asso = update_assopalettecouleur(db, asso.id, AssoPaletteCouleurCreate(palette_id = asso.palette_id, position = asso.position, couleur_id = couleur_id))
@@ -156,7 +156,7 @@ def rt_create_palette(palette_id: int, palette: PaletteCreateFull, request: Requ
                     if couleur != None:
                         couleur_id = couleur.id
                     else:
-                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color)))
+                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color))).id
                     asso = create_assopalettecouleur(db, dict(AssoPaletteCouleurCreate(palette_id = palette_id, couleur_id = couleur_id, position = color.position)))
 
         elif len_pd < len_pod:
@@ -168,7 +168,7 @@ def rt_create_palette(palette_id: int, palette: PaletteCreateFull, request: Requ
                     if couleur != None:
                         couleur_id = couleur.id
                     else:
-                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color)))
+                        couleur_id = create_couleur(db, dict(CouleurCreate(color=color.color))).id
 
                     asso = db.query(AssoPaletteCouleur).filter(palette_id == AssoPaletteCouleur.palette_id, color.position == AssoPaletteCouleur.position).first()
                     asso = update_assopalettecouleur(db, asso.id, AssoPaletteCouleurCreate(palette_id = asso.palette_id, position = asso.position, couleur_id = couleur_id))
