@@ -242,7 +242,7 @@ function save_palette(){
         });
 }
 
-function create_new_palette(){
+async function create_new_palette(){
     couleurs_data = [];
     for (var i=0; i<colors.length; i++){
         couleurs_data[i] = { color: colors[i][1], position: i }
@@ -265,15 +265,23 @@ function create_new_palette(){
         body: JSON.stringify(data),
     };
     
+    try {
+        const response = await fetch(api_url + "/palettes/", requestOptions)
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json()
+        console.log('Réponse de l\'API:', data);
+        palette_id = data.id;
+        window.location.href = "./palette_editor?mode=edit&id=" + palette_id
+
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+
     // Effectuer la requête
-    fetch(api_url + "/palettes/", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Réponse de l\'API:', data);
-            palette_id = data.id;
-            window.location.href = "./palette_editor?mode=edit&id=" + palette.id
-        })
-        .catch(error => {
-            console.error('Erreur lors de la requête:', error);
-        });
+    
 }

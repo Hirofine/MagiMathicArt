@@ -3,10 +3,9 @@ nav_deco = document.getElementById("nav-deco");
 nav_co = document.getElementById("nav-co");
 var palettes = [];
 const palette_div = document.getElementById("Palettes");
+const projet_div = document.getElementById("Projets");
 var is_connected = false;
 document.addEventListener("DOMContentLoaded", function () {
-
-    
     console.log("loaded page");
     fetch(api_url + `/verify-session/`,{
         method: 'GET',
@@ -22,8 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 console.error("Erreur lors de la vérification du pseudo : " + error);
             });
-    
-    
 });
 
 async function update_page(is_connected){
@@ -31,16 +28,8 @@ async function update_page(is_connected){
         case true:
             nav_deco.style.display = "none";
             nav_co.style.display = "block";
-            const palettes = await retrieve_user_palettes();
-            palettes.forEach(function(palette){
-                display_palette(palette);
-            });
-            var new_palette_button = document.createElement("button");
-            new_palette_button.innerHTML = "Nouvelle Palette";
-            new_palette_button.addEventListener("click", function(){
-                window.location.href = "./palette_editor?mode=new&id=0";
-            })
-            palette_div.appendChild(new_palette_button)
+            display_pals();
+            display_projs();
             console.log("case true");
             break;
         case false:
@@ -78,6 +67,54 @@ async function retrieve_user_palettes() {
     }
 }
 
+async function retrieve_user_projets() {
+    try {
+        const response = await fetch(api_url + `/projet_from_user/`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("data :", data);
+        const projet_list = data["projets"];
+        console.log("p1 : ", projet_list);
+        return projet_list;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
+async function display_pals(){
+    const palettes = await retrieve_user_palettes();
+    palettes.forEach(function(palette){
+        display_palette(palette);
+    });
+    var new_palette_button = document.createElement("button");
+    new_palette_button.innerHTML = "Nouvelle Palette";
+    new_palette_button.addEventListener("click", function(){
+        window.location.href = "./palette_editor?mode=new&id=0";
+    })
+    palette_div.appendChild(new_palette_button)
+}
+
+async function display_projs(){
+    const projets = await retrieve_user_projets();
+    projets.forEach(function(projet){
+        display_projet(projet);
+    });
+    var new_projet_button = document.createElement("button");
+    new_projet_button.innerHTML = "Nouveau Projet";
+    new_projet_button.addEventListener("click", function(){
+        window.location.href = "./editeur?mode=new&id=0";
+    })
+    projet_div.appendChild(new_projet_button)
+}
+
 function display_palette(palette){
     var palette_button = document.createElement("button");
     palette_button.innerHTML = palette.nom;
@@ -86,4 +123,14 @@ function display_palette(palette){
     })
     palette_div.appendChild(palette_button)
     console.log(palette);
+}
+
+function display_projet(projet){
+    var projet_button = document.createElement("button");
+    projet_button.innerHTML = projet.nom;
+    projet_button.addEventListener("click", function(){
+        window.location.href = "./editeur?mode=edit&id=" + projet.id;
+    })
+    projet_div.appendChild(projet_button)
+    console.log(projet);
 }

@@ -5,9 +5,12 @@ from sqlalchemy import text, or_
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Request
 from fastapi.responses import StreamingResponse
 from helper import verify_token, user_id_from_token, TOKEN_VALIDE, TOKEN_EXPIRE, TOKEN_INVALIDE, TOKEN_NOT_SENT, USER_NOT_EXISTANT
-from models.index import Palettes, Couleurs, AssoPaletteCouleur, AssoUserPalette
+from models.index import Palettes, Couleurs, AssoPaletteCouleur, AssoUserPalette, AssoUserProjet, AssoProjetPalette
 from schemas.index import Palette, PaletteCreate, PaletteUpdate, CouleurCreate, AssoPaletteCouleurCreate, AssoUserPaletteCreate
 from crud.palettes import create_palette, get_palette, update_palette, delete_palette  # Importez les fonctions spécifiques
+from crud.projets import get_projet
+from crud.assouserprojet import get_assouserprojet
+from crud.assoprojetpalette import get_assoprojetpalette
 from routes.couleurs import rt_find_couleur, rt_create_couleur
 from crud.couleurs import create_couleur
 from crud.assopalettecouleur import create_assopalettecouleur, update_assopalettecouleur, delete_assopalettecouleur
@@ -57,6 +60,8 @@ def rt_create_palette(palette: PaletteCreateFull, request: Request, db: Session 
         create_assouserpalette(db, dict(user_id=user_id, palette_id = new_palette.id))
     else:
         print("c'est la mierda??  ", tok_val)
+    
+    print (new_palette)
     return new_palette
 
 @palette.get("/palette_full/{palette_id}")
@@ -64,6 +69,46 @@ def rt_read_palette_full(palette_id: int, request: Request, db: Session = Depend
     tok_val = verify_token(request, db)
     if(tok_val == TOKEN_VALIDE):
         user_id = user_id_from_token(request, db)
+        palette = get_palette(db, palette_id)
+        if palette is None:
+            raise HTTPException(status_code=404, detail="Palette not found")
+        
+        palette_owner = db.query(AssoUserPalette).filter(palette_id == AssoUserPalette.palette_id).first().user_id
+        if palette_owner != user_id:
+            raise HTTPException(status_code=404, detail="Vous n'avez pas accés à cette palette")
+
+        asso_couleurs = db.query(AssoPaletteCouleur).filter(palette_id == AssoPaletteCouleur.palette_id).order_by(AssoPaletteCouleur.position).all()
+        couleurs : List[CouleurPosi] = []
+        for asso in asso_couleurs:
+            coul = db.query(Couleurs).filter(Couleurs.id == asso.couleur_id).first()
+            couleurs.append(CouleurPosi(color = coul.color, position = asso.position))
+        
+        new_palette = PaletteCreateFull(nom = palette.nom, couleurs = couleurs)
+        return new_palette
+    else :
+        raise HTTPException(status_code=404, detail="Palette not found")
+    
+@palette.get("/palette_full_from_projet/{projet_id}")
+def rt_read_palette_full(projet_id: int, request: Request, db: Session = Depends(get_db)):
+    tok_val = verify_token(request, db)
+    if(tok_val == TOKEN_VALIDE):
+        user_id = user_id_from_token(request, db)
+        projet = get_projet(db, projet_id)
+        if projet == None:
+            raise HTTPException(status_code=404, detail="Projet not found")
+        
+        assouserprojet = db.query(AssoUserProjet).filter(AssoUserProjet.projet_id == projet_id).first()
+        if assouserprojet == None:
+            raise HTTPException(status_code=404, detail="Projet not associated to a user")
+        
+        if assouserprojet.user_id != user_id:
+            raise HTTPException(status_code=404, detail="User not allowed to access")
+        
+        assoprojetpalette = db.query(AssoProjetPalette).filter(AssoProjetPalette.projet_id == projet_id).first()
+        if assoprojetpalette == None:
+            raise HTTPException(status_code=404, detail="Pas de palette associée à ce projet")
+
+        palette_id = assoprojetpalette.palette_id
         palette = get_palette(db, palette_id)
         if palette is None:
             raise HTTPException(status_code=404, detail="Palette not found")
