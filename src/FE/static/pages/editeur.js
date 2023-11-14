@@ -1,6 +1,6 @@
 var api_url = "https://be.magimathicart.hirofine.fr"
-nav_deco = document.getElementById("nav-deco");
-nav_co = document.getElementById("nav-co");
+const nav_deco = document.getElementById("nav-deco");
+const nav_co = document.getElementById("nav-co");
 var palettes = [];
 const palette_div = document.getElementById("Palettes");
 const projet_div = document.getElementById("Projets");
@@ -63,7 +63,7 @@ save_button.addEventListener("click", async function(){
 })
 
 palette_name_input.addEventListener("change", async function(){
-    palette = await update_palette();
+    var palette = await update_palette();
     console.log(palette);
     display_palette(palette);
     display_pixelart(pixelart, palette);
@@ -78,7 +78,7 @@ function resize_pixel_art(new_dimX, new_dimY){
             if (x < dimX && y < dimY){
                 new_pix[x][y] = pixart[x][y];
             }else{
-                new_pix[x][y] = ["#ffffff", 0];
+                new_pix[x][y] = ["#ffffff", -1];
             }
             
         }
@@ -143,7 +143,7 @@ async function create_new_projet(palette){
     for (var x=0; x<dimX; x++){
         new_pix[x] = [];
         for (var y=0; y<dimY; y++){
-            new_pix[x][y] = ["#ffffff", 0];
+            new_pix[x][y] = ["#ffffff", -1];
         }
     }
     pixart = new_pix;
@@ -195,7 +195,13 @@ function load_pixel_art(pixelart, palette){
         const line = document.createElement("div")
         
         for (var y=0; y<dimY; y++){
-            pixart[x][y] = [palette["couleurs"][pixels[x * dimY + y][2]].color, pixels[x * dimY + y][2]];
+            indice = pixels[x * dimY + y][2];
+            couleur = "#ffffff";
+            if (indice != -1){
+                couleur = palette["couleurs"][indice].color;
+            }
+            
+            pixart[x][y] = [couleur, indice];
         }
     }
 }

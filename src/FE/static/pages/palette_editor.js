@@ -1,5 +1,7 @@
 var api_url = "https://be.magimathicart.hirofine.fr"
 const colorTable = document.getElementById("palette-display");
+const nav_deco = document.getElementById("nav-deco");
+const nav_co = document.getElementById("nav-co");
 const sliders = document.querySelectorAll('.slider');
 const colorBox = document.getElementById('color-box');
 const selectButton = document.getElementById('validate-color');
@@ -15,8 +17,42 @@ var mode ="new";
 
 document.addEventListener("DOMContentLoaded", function() {
     // Sélectionnez le conteneur du tableau  
+
+        console.log("loaded page");
+        fetch(api_url + `/verify-session/`,{
+            method: 'GET',
+            credentials: 'include'
+        })
+                .then(response => response.json())
+                .then(data => {
+                   console.log(data);
+                   console.log(data.data);
+                   is_connected = data.data;
+                   update_page(is_connected)
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la vérification du pseudo : " + error);
+                });
+    
     //determine mode
-    var queryString = window.location.search;
+    
+
+    //display les couleurs déjà présente
+    
+
+
+    // Créez un tableau de couleurs
+
+    
+    // Parcourez le tableau de couleurs et créez des cases carrées
+});
+
+async function update_page(is_connected){
+    switch(is_connected){
+        case true:
+            nav_deco.style.display = "none";
+            nav_co.style.display = "block";
+            var queryString = window.location.search;
     var params = new URLSearchParams(queryString);
 
     mode = params.get("mode");
@@ -34,16 +70,19 @@ document.addEventListener("DOMContentLoaded", function() {
         display_palette(id);
         
     }
-
-    //display les couleurs déjà présente
-    
-
-
-    // Créez un tableau de couleurs
-
-    
-    // Parcourez le tableau de couleurs et créez des cases carrées
-});
+            break;
+        case false:
+            nav_deco.style.display = "block";
+            nav_co.style.display = "none";
+            console.log("case false");
+            break;
+        default:
+            nav_deco.style.display = "block";
+            nav_co.style.display = "none";
+            console.log("case default");
+            break;
+       }
+}
 
 async function display_palette(id){
     palette = await get_palette(id);
