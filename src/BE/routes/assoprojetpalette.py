@@ -12,7 +12,28 @@ from crud.assouserprojet import get_assouserprojet
 assoprojetpalette = APIRouter()
 
 @assoprojetpalette.post("/assoprojetpalette/", response_model=AssoProjetPalette)
-def rt_create_assoprojetpalette(assoprojetpalette: AssoProjetPaletteCreate, db: Session = Depends(get_db)):
+def rt_create_assoprojetpalette(assoprojetpalette: AssoProjetPaletteCreate, request: Request, db: Session = Depends(get_db)):
+    tok_val = verify_token(request, db)
+    if(tok_val == TOKEN_VALIDE):
+        user_id = user_id_from_token(request, db)
+        projet_id = assoprojetpalette.projet_id
+        projet = get_projet(db, projet_id)
+
+        if projet == None:
+            raise HTTPException(status_code=404, detail="Ce Projet n'existe pas")
+
+        asso = db.query(AssoUserProjet).filter(AssoUserProjet.user_id == user_id, AssoUserProjet.projet_id == projet_id).first()
+        if asso == None:
+            raise HTTPException(status_code=404, detail="Vous n'avez pas acces à ce projet")
+
+        palette = db.query(Palettes).filter(Palettes.id == assoprojetpalette.palette_id).first()
+        if palette == None:
+            raise HTTPException(status_code=404, detail="La palette n'existe pas")
+
+        assopal = db.query(AssoUserPalette).filter(AssoUserPalette.user_id == user_id, AssoUserPalette.palette_id == palette.id).first()
+        if assopal == None:
+            raise HTTPException(status_code=404, detail="Vous n'avez pas acces à cette palette")
+        
     assoprojetpalette_data = dict(assoprojetpalette)  # Convertit l'objet AssoProjetPaletteCreate en dictionnaire
     return create_assoprojetpalette(db, assoprojetpalette_data)
 

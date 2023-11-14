@@ -50,8 +50,16 @@ valider_dimension_button.addEventListener("click", function(){
     
 });
 
-save_button.addEventListener("click", function(){
-    save_projet();
+save_button.addEventListener("click", async function(){
+    switch(mode){
+        case "edit":
+            save_projet();
+            break;
+        case "new":
+            pr = await create_projet();
+            window.location.href = "./editeur?mode=edit&id=" + pr["id"];
+    }
+    
 })
 
 palette_name_input.addEventListener("change", async function(){
@@ -91,7 +99,8 @@ async function update_page(is_connected){
             projet_id = params.get("id");
             //mode new
             if(mode == "new"){
-                
+                palette = await update_palette_selector();
+                create_new_projet(palette);
             }
             if(mode == "edit"){
                 a = await update_palette_selector();
@@ -113,6 +122,35 @@ async function update_page(is_connected){
        }
 }
 
+async function create_new_projet(palette){
+    projet_name_input.value = "Nouveau Projet";
+    projet_desc_input.value = "Nouveau Projet";
+
+    pixelart_name_input.value = "Nouveau Dessin";
+    pixelart_desc_input.value = "Dessin du projet ...";
+
+    dimX = 20;
+    dimY = 20;
+    dimX_input.value = dimX;
+    dimY_input.value = dimY;
+
+    palette_name_input.value = palette["id"];
+    p_full = await retrieve_palette_id(palette["id"])
+    console.log(p_full);
+    display_palette(p_full);
+
+    var new_pix = [];
+    for (var x=0; x<dimX; x++){
+        new_pix[x] = [];
+        for (var y=0; y<dimY; y++){
+            new_pix[x][y] = ["#ffffff", 0];
+        }
+    }
+    pixart = new_pix;
+    resize_pixel_art(dimX, dimY);
+}
+
+
 async function update_palette_selector(){
     pals = await retrieve_palette_user();
     palettes = pals["palettes"];
@@ -122,7 +160,7 @@ async function update_palette_selector(){
         opt.innerHTML = palette["nom"];
         palette_name_input.appendChild(opt);
     });
-    return 1;
+    return palettes[0];
 }
 
 async function display_existing(projet){
@@ -305,7 +343,7 @@ async function retrieve_palette_projet(projet_id){
     }
 }
 
-async function retrieve_palette_user(projet_id){
+async function retrieve_palette_user(){
     try {
         const response = await fetch(api_url + '/palette_from_user/', {
             method: 'GET',
@@ -322,6 +360,22 @@ async function retrieve_palette_user(projet_id){
     }
 }
 
+async function retrieve_palette_id(palette_id){
+    try {
+        const response = await fetch(api_url + '/palette_full/' + palette_id, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
 
 async function retrieve_pixel_art_projet(projet_id){
     try {
@@ -340,7 +394,48 @@ async function retrieve_pixel_art_projet(projet_id){
     }
 }
 
+async function create_projet(){
+    var data = {
+        nom: projet_name_input.value,
+        description: projet_desc_input.value
+    };
+    
+
+    console.log(JSON.stringify(data));
+    // Configuration de la requête
+    var requestOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    
+    // Effectuer la requête
+    try{
+        response = await fetch(api_url + "/projets/", requestOptions) ;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        projet_id = data.id;
+    
+        a = await create_projet_palette();
+        b = await create_pixel_art();
+        c = await create_asso_projet_pixelart(projet_id, b["id"]);
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+    
+    
+}
+
 async function save_projet(){
+    
     var data = {
         nom: projet_name_input.value,
         description: projet_desc_input.value
@@ -373,6 +468,42 @@ async function save_projet(){
     save_pixel_art();
 }
 
+async function create_projet_palette(){
+    var data = {
+        projet_id: projet_id,
+        palette_id: palette_name_input.value
+    };
+    
+
+    console.log(JSON.stringify(data));
+    // Configuration de la requête
+    var requestOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    
+    // Effectuer la requête
+    try{
+        response = await fetch(api_url + "/assoprojetpalette/", requestOptions) ;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+    
+    
+}
+
 async function save_palette(){
     var data = {
         projet_id: projet_id,
@@ -401,6 +532,46 @@ async function save_palette(){
         .catch(error => {
             console.error('Erreur lors de la requête:', error);
         });
+}
+
+async function create_pixel_art(){
+    var data = {
+        nom: pixelart_name_input.value,
+        description: pixelart_desc_input.value,
+        dimensionsX: dimX,
+        dimensionsY: dimY,
+        art: pixart_to_string(),
+    };
+    
+
+    console.log(JSON.stringify(data));
+    // Configuration de la requête
+    var requestOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    
+    // Effectuer la requête
+    try{
+        response = await fetch(api_url + "/pixelarts/", requestOptions) ;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+
+
+
 }
 
 async function save_pixel_art(){
@@ -434,6 +605,39 @@ async function save_pixel_art(){
         .catch(error => {
             console.error('Erreur lors de la requête:', error);
         });
+}
+
+async function create_asso_projet_pixelart(proj_id, pixart_id){
+    var data = {
+        projet_id: proj_id,
+        pixelart_id: pixart_id
+    };
+    
+
+    console.log(JSON.stringify(data));
+    // Configuration de la requête
+    var requestOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    // Effectuer la requête
+    try{
+        response = await fetch(api_url + "/assoprojetpixelart/", requestOptions) ;
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
 }
 
 function pixart_to_string(){

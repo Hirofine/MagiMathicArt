@@ -12,6 +12,7 @@ projet = APIRouter()
 
 @projet.post("/projets/", response_model=Projet)
 def rt_create_projet(projet: ProjetCreate, request: Request, db: Session = Depends(get_db)):
+    print(projet)
     tok_val = verify_token(request, db)
     if(tok_val == TOKEN_VALIDE):
         user_id = user_id_from_token(request, db)

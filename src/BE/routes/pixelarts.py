@@ -4,16 +4,28 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status,
 from fastapi.responses import StreamingResponse
 from helper import verify_token, user_id_from_token, TOKEN_VALIDE
 from models.index import PixelArts, AssoUserProjet, AssoProjetPixelArt, AssoUserPixelArt
-from schemas.index import PixelArt, PixelArtCreate, PixelArtUpdate
+from schemas.index import PixelArt, PixelArtCreate, PixelArtUpdate, AssoUserPixelArtCreate
 from crud.pixelarts import create_pixelart, get_pixelart, update_pixelart, delete_pixelart  # Importez les fonctions spécifiques
 from crud.projets import get_projet
+from crud.assouserpixelart import create_assouserpixelart
 
 pixelart = APIRouter()
 
 @pixelart.post("/pixelarts/", response_model=PixelArt)
-def rt_create_pixelart(pixelart: PixelArtCreate, db: Session = Depends(get_db)):
-    pixelart_data = dict(pixelart)  # Convertit l'objet PixelArtCreate en dictionnaire
-    return create_pixelart(db, pixelart_data)
+def rt_create_pixelart(pixelart: PixelArtCreate, request: Request, db: Session = Depends(get_db)):
+    tok_val = verify_token(request, db)
+    if(tok_val == TOKEN_VALIDE):
+        user_id = user_id_from_token(request, db)
+       
+        pixelart_data = dict(pixelart)  # Convertit l'objet PixelArtCreate en dictionnaire
+        pixel_art = create_pixelart(db, pixelart_data)
+
+        data = dict(AssoUserPixelArtCreate(user_id = user_id, pixelart_id = pixel_art.id))
+        assouserpixart = create_assouserpixelart(db, data)
+        if assouserpixart == None:
+            raise HTTPException(status_code=404, detail="Error when creating pixelart")
+
+    return pixel_art
 
 @pixelart.get("/pixelarts/{pixelart_id}", response_model=PixelArt)
 def rt_read_pixelart(pixelart_id: int, db: Session = Depends(get_db)):
