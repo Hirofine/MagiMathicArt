@@ -17,6 +17,10 @@ const fonct_select = document.getElementById("fonction-select")
 
 const enregistrer_button = document.getElementById("enregistrer-button");
 
+const fonct_params_div = document.getElementById("fonction-params");
+const fct_par_max_label = document.getElementById("fct-param-max-label");
+const fct_par_max_input = document.getElementById("fct-param-max-input");
+
 var mode = "new";
 var id = 0;
 
@@ -54,8 +58,28 @@ genre_select.addEventListener("change", function (){
         case "fonct":
             add_perso_div.style.display = "none";
             add_fonct_div.style.display = "block";
+            fonct_select.value = "";
             break;
         
+    }
+});
+
+fonct_select.addEventListener("change", function(){
+    switch(fonct_select.value){
+        case "fonct-soenpoeg":
+            fct_par_max_label.style.display = "block";
+            fct_par_max_input.style.display = "block";
+            break;
+        case "fonct-soenpoineg":
+            fct_par_max_label.style.display = "block";
+            fct_par_max_input.style.display = "block";
+            break;
+        case "fonct-soenpoinst":
+            fct_par_max_label.style.display = "block";
+            fct_par_max_input.style.display = "block";
+            break;
+        default:
+            break;
     }
 });
 
@@ -155,12 +179,39 @@ function display_reponse(){
     description_input.value = reponse["description"];
     ennonce_input.value = reponse["ennonce"];
     genre_select.value = reponse["genre"];
+    
     switch (reponse["genre"]){
         case "perso":
             questions = JSON.parse(reponse["fonction"]);
             draw_questions();
             break;
         case "fonct":
+            var data = reponse["fonction"].split("&");
+            var fonct = data[0];
+            var max = 0;
+            switch(fonct){
+                case "fonct-soenpoeg":
+                    max = data[1];
+                    break;
+                case "fonct-soenpoineg":
+                    max = data[1];
+                    break;
+                case "fonct-soenpoinst":
+                    max = data[1];
+                    break;
+                default:
+                    break;
+            }
+            genre_select.dispatchEvent(new Event("change"));
+            
+
+            fonct_select.value = fonct;
+            fct_par_max_input.value = max;
+            fonct_select.dispatchEvent(new Event("change"));
+            
+            
+            
+            
             break;
         default:
             break;
@@ -207,12 +258,34 @@ function draw_questions(){
 }
 
 async function save_reponse(){
+    var fonction = "";
+    console.log(fonct_select.value);
+    if(genre_select.value == "fonct"){
+        console.log(fonct_select.value);
+        switch(fonct_select.value){
+            
+            case "fonct-soenpoeg":
+                fonction = "fonct-soenpoeg&" + fct_par_max_input.value;
+                break;
+            case "fonct-soenpoineg":
+                fonction = "fonct-soenpoineg" + fct_par_max_input.value;
+                break;
+            case "fonct-soenpoinst":
+                fonction = "fonct-soenpoinst" + fct_par_max_input.value;
+                break;
+            default:
+                break;
+        }
+    }else{
+        fonction = JSON.stringify(questions);
+    }
+    
     data = {
         nom: nom_input.value,
         description: description_input.value,
         ennonce: ennonce_input.value,
         genre: genre_select.value,
-        fonction: JSON.stringify(questions)
+        fonction: fonction
     }
 
     var requestOptions = {
@@ -238,12 +311,31 @@ async function save_reponse(){
 }
 
 async function create_reponse(){
+    var fonction = "";
+    if(genre_select.value == "fonct"){
+        switch(fonct_select.value){
+            case "fonct-soenpoeg":
+                fonction = "fonct-soenpoeg&" + fct_par_max_input.value;
+                break;
+            case "fonct-soenpoineg":
+                fonction = "fonct-soenpoineg" + fct_par_max_input.value;
+                break;
+            case "fonct-soenpoinst":
+                fonction = "fonct-soenpoinst" + fct_par_max_input.value;
+                break;
+            default:
+                break;
+        }
+    }else{
+        fonction = JSON.stringify(questions);
+    }
+    
     data = {
         nom: nom_input.value,
         description: description_input.value,
         ennonce: ennonce_input.value,
         genre: genre_select.value,
-        fonction: JSON.stringify(questions)
+        fonction: fonction
     }
         
     console.log(JSON.stringify(data));
@@ -277,4 +369,21 @@ async function create_reponse(){
         // Effectuer la requête
         
     
+}
+
+function sommeEntierPositifEgal(max){
+    a = Math.floor(Math.random() * max);
+    b = max - a;
+    return a + " + " + b;
+}
+
+function sommeEntierPositifInfEg(max){
+    a = Math.floor(Math.random() * max);
+    b = Math.floor(Math.random() * (max - a) + 1);
+    return a + " + " + b;
+}
+function sommeEntierPositirInfStr(max){
+    a = Math.floor(Math.random() * max);
+    b = Math.floor(Math.random() * (max - a));
+    return a + " + " + b;
 }
