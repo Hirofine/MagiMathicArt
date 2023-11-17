@@ -177,8 +177,26 @@ function draw_question(id){
     const question_div = document.createElement("div");
     const question_text = document.createElement("input");
     question_text.value = questions[id];
+
+    question_text.addEventListener("blur", function(){
+        const parentDiv = remove_button.parentNode;
+        const index = Array.from(parentDiv.parentNode.children).indexOf(parentDiv);
+        questions[index] = question_text.value;
+    });
+    
+    const remove_button = document.createElement("button");
+    remove_button.innerHTML = "X";
+    remove_button.addEventListener("click", function(){
+        const parentDiv = remove_button.parentNode;
+        const index = Array.from(parentDiv.parentNode.children).indexOf(parentDiv); 
+        questions.splice(index, 1);
+        parentDiv.remove(); 
+    })
     question_div.appendChild(question_text);
-    quest_div.appendChild(question_text);
+    question_div.appendChild(remove_button);
+
+    quest_div.appendChild(question_div);
+    
 }
 
 function draw_questions(){
