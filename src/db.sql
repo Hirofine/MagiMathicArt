@@ -54,6 +54,7 @@ CREATE TABLE Reponses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   description TEXT,
+  ennonce TEXT,
   fonction TEXT -- Stockez ici les fonctions ou données de réponse
   -- Autres colonnes de réponse
 );

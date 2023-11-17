@@ -9,4 +9,6 @@ class Reponses(Base):
     nom = Column(String, index=True)
     description = Column(Text)
     fonction = Column(Text)  # Stockez ici les fonctions ou données de réponse
+    ennonce = Column(Text)
+    genre = Column(Text)
     # Autres colonnes de réponse, ajoutez-les ici si nécessaire

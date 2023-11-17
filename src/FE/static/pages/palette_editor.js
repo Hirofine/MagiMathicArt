@@ -34,17 +34,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     console.error("Erreur lors de la vérification du pseudo : " + error);
                 });
     
-    //determine mode
-    
-
-    //display les couleurs déjà présente
-    
-
-
-    // Créez un tableau de couleurs
-
-    
-    // Parcourez le tableau de couleurs et créez des cases carrées
 });
 
 async function update_page(is_connected){
@@ -53,23 +42,23 @@ async function update_page(is_connected){
             nav_deco.style.display = "none";
             nav_co.style.display = "block";
             var queryString = window.location.search;
-    var params = new URLSearchParams(queryString);
+            var params = new URLSearchParams(queryString);
 
-    mode = params.get("mode");
-    id = params.get("id");
-    //mode new
-    if(mode == "new"){
-        colors = [[0, "#FFFFFF"]];
-        refresh_colors();
-    }
-    if(mode == "test"){
-        colors =[[0,"#ff736e"], [1,"#d30256"], [2,"#d3fa56"],[3,"#da02e6"],[4,"#d1c556"]];
-        refresh_colors();
-    }
-    if(mode == "edit"){
-        display_palette(id);
-        
-    }
+            mode = params.get("mode");
+            id = params.get("id");
+            //mode new
+            if(mode == "new"){
+                colors = [[0, "#FFFFFF"]];
+                refresh_colors();
+            }
+            if(mode == "test"){
+                colors =[[0,"#ff736e"], [1,"#d30256"], [2,"#d3fa56"],[3,"#da02e6"],[4,"#d1c556"]];
+                refresh_colors();
+            }
+            if(mode == "edit"){
+                display_palette(id);
+                
+            }
             break;
         case false:
             nav_deco.style.display = "block";

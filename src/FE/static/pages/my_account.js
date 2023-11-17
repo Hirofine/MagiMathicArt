@@ -4,6 +4,7 @@ nav_co = document.getElementById("nav-co");
 var palettes = [];
 const palette_div = document.getElementById("Palettes");
 const projet_div = document.getElementById("Projets");
+const reponse_div = document.getElementById("Ennonces")
 var is_connected = false;
 document.addEventListener("DOMContentLoaded", function () {
     console.log("loaded page");
@@ -30,6 +31,7 @@ async function update_page(is_connected){
             nav_co.style.display = "block";
             display_pals();
             display_projs();
+            display_reps();
             console.log("case true");
             break;
         case false:
@@ -89,6 +91,28 @@ async function retrieve_user_projets() {
     }
 }
 
+async function retrieve_user_reponses(){
+    try {
+        const response = await fetch(api_url + `/reponse_from_user/`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("data :", data);
+        const reponse_list = data["reponses"];
+        
+        return reponse_list;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
 async function display_pals(){
     const palettes = await retrieve_user_palettes();
     palettes.forEach(function(palette){
@@ -115,6 +139,19 @@ async function display_projs(){
     projet_div.appendChild(new_projet_button)
 }
 
+async function display_reps(){
+    const reponses = await retrieve_user_reponses();
+    reponses.forEach(function(reponse){
+        display_reponse(reponse);
+    });
+    var new_reponse_button = document.createElement("button");
+    new_reponse_button.innerHTML = "Nouvel Énnoncé";
+    new_reponse_button.addEventListener("click", function(){
+        window.location.href = "./reponse_editeur?mode=new&id=0";
+    })
+    reponse_div.appendChild(new_reponse_button)
+}
+
 function display_palette(palette){
     var palette_button = document.createElement("button");
     palette_button.innerHTML = palette.nom;
@@ -133,4 +170,14 @@ function display_projet(projet){
     })
     projet_div.appendChild(projet_button)
     console.log(projet);
+}
+
+function display_reponse(reponse){
+    var reponse_button = document.createElement("button");
+    reponse_button.innerHTML = reponse.nom;
+    reponse_button.addEventListener("click", function(){
+        window.location.href = "./reponse_editeur?mode=edit&id=" + reponse.id;
+    })
+    reponse_div.appendChild(reponse_button)
+    console.log(reponse);
 }

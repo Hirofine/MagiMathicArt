@@ -4,6 +4,8 @@ class ReponseBase(BaseModel):
     nom: str
     description: str
     fonction: str
+    ennonce: str
+    genre: str
 
 class ReponseCreate(ReponseBase):
     pass

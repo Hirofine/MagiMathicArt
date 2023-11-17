@@ -63,6 +63,11 @@ async def read_root():
 async def read_root():
     with open(path.join("static", "pages/palette_editor.html"), "r") as f:
         return HTMLResponse(content=f.read())
+    
+@app.get("/reponse_editeur")
+async def read_root():
+    with open(path.join("static", "pages/reponse_editor.html"), "r") as f:
+        return HTMLResponse(content=f.read())
 
 @app.get("/editeur")
 async def read_root():

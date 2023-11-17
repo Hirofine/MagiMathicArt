@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = "UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="manifest" href="static/manifest.json">
+</head>
+<body>
+    <header>
+        <h1>Page web Home</h1>
+        <nav>
+            <ul id="nav-deco">
+                <li><a href="https://be.magimathicart.hirofine.fr/login">Connexion</a></li>
+                <li><a href="https://be.magimathicart.hirofine.fr/register">Création de Compte</a></li>
+            </ul>
+            <ul id="nav-co" style="display:none">
+                <li><a href="https://magimathicart.hirofine.fr/my_account">Mon Comtpe</a></li>
+                <li><a href="https://be.magimathicart.hirofine.fr/disconnect">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div>
+            <ul>
+                <li>
+                    <label for="nom-input">Nom</label>
+                    <input type="text" id="nom-input">
+                </li>
+                <li>
+                    <label for="desciption-input">Description</label>
+                    <input type="text" id="description-input">
+                </li>
+                <li>
+                    <label for="ennonce-input">Énnoncé</label>
+                    <input type="text" id="ennonce-input">
+                </li>
+                <li>
+                    <label for="genre-select">Type</label>
+                    <select id="genre-select">
+                        <option id="genre-perso" value="perso" >Personnalisé</option>
+                        <option id="genre-fonct" value="fonct">Fonction</option>
+                    </select>
+                </li>
+            </ul>
+            
+            
+            
+            
+        </div>
+        <div>
+            <div id="add-perso-div">
+                <ul>
+                    <li>
+                        <label for="add-quest-field">Questions Possibles</label>
+                        <input id="add-quest-field" type="text">
+                    </li>
+                    <li>
+                        <button id="add-quest-button">Ajouter</button>
+                    </li>
+                </ul>
+                <div id="quest-div">
+    
+                </div>
+            </div>
+            <div id="add-fonct-div" style="display: none;">
+                <label for="fonction-select">Fonction</label>
+                <select id="fonction-select">
+                    <option id="fonction-1">Fonction 1</option>
+                    <option id="fonction-2">Fonction 2</option>
+                    <option id="fonction-3">Fonction 3</option>
+                </select>
+                
+            </div>
+            
+        </div>
+        <div>
+            <button id="enregistrer-button">Enregistrer</button>
+        </div>
+        
+        
+    </main>
+</body>
+<script src="./static/pages/reponse_editor.js"></script>
+</html>
