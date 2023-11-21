@@ -116,6 +116,12 @@ async function update_page(is_connected){
                 av_reponses = await retrieve_user_reponses();
                 as_reponses = await retrieve_asso_projet_reponse(projet_id);
                 asso_reponse_empl = await retrieve_asso_projet_palette_reponse_from_projet(projet_id);
+                asso_reponse_empl.forEach((asso, i) => function(){
+                    asso_reponse_empl[i] = {"reponse_id": asso["reponse_id"],
+                                            "position": asso["position"],
+                                            "projet_id": asso["projet_id"],
+                                            "palette_id": asso["palette_id"]};
+                })
                 display_existing(projet);
                 
             }
@@ -213,7 +219,7 @@ function display_associated_reponses(palette){
     console.log("as_rep  =", as_reponses);
     console.log("palette : ", palette);
     console.log("asso_empl : ", asso_reponse_empl[0]["reponse_id"]);
-    as_reponses.forEach((rep) => {
+    as_reponses.forEach((rep, i) => {
         const div_as_rep = document.createElement("div");
         const lab_as_rep = document.createElement("label");
         const color_div = document.createElement("div");
@@ -229,10 +235,58 @@ function display_associated_reponses(palette){
         }
         color_div.style.backgroundColor = color;
         color_div.className = "square";
+        color_div.onclick = (event) => {
+            const allPaletteDisplay = document.querySelectorAll(".palette_display");
+            console.log("allpale : ", allPaletteDisplay);
+            allPaletteDisplay.forEach((pal) => {
+                pal.remove();
+            });
+            open_palette_selector(rep, color_div, div_as_rep, i);
+        }
         div_as_rep.appendChild(lab_as_rep);
         div_as_rep.appendChild(color_div);
         as_reponse_div.appendChild(div_as_rep);
     });
+}
+
+function open_palette_selector(rep, color_div, div_as_rep, indice){
+    console.log("truc, ", div_as_rep);
+    const palette_div = document.createElement("div");
+    palette_div.className = "palette_display";
+    colors_data = palette["couleurs"];
+    colors = [];
+    colors_data.forEach((col, i) => {
+        colors[i] = [col.position, col.color]; 
+    })
+    console.log(colors);
+    paletteName = palette["nom"];
+    palette_div.innerHTML = "";
+    colors.forEach(function(color, i){
+        const square = document.createElement("div");
+        square.className = "square";
+        if (asso_reponse_empl[indice] != null && i == asso_reponse_empl[indice]["position"]){
+            square.classList.add("selected");
+        }
+        square.style.backgroundColor = color[1];
+        square.id = "square-" + color[0];
+        palette_div.appendChild(square);
+        square.onclick = (event) => {
+            if (asso_reponse_empl[indice] == null){
+                asso_reponse_empl[indice] = {"reponse_id": rep["id"],
+                                                "position": 0,
+                                                "projet_id": parseInt(projet_id),
+                                                "palette_id": palette["id"]};
+            }
+            asso_reponse_empl[indice]["position"] = parseInt(square.id.split("-")[1]);
+            color_div.style.backgroundColor = colors[square.id.split("-")[1]][1];
+            const allPaletteDisplay = document.querySelectorAll(".palette_display");
+            console.log("allpale : ", allPaletteDisplay);
+            allPaletteDisplay.forEach((pal) => {
+                pal.remove();
+            });
+        }
+    });
+    div_as_rep.appendChild(palette_div);
 }
 
 function load_pixel_art(pixelart, palette){
