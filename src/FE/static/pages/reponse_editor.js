@@ -204,13 +204,9 @@ function display_reponse(){
             }
             genre_select.dispatchEvent(new Event("change"));
             
-
             fonct_select.value = fonct;
             fct_par_max_input.value = max;
             fonct_select.dispatchEvent(new Event("change"));
-            
-            
-            
             
             break;
         default:
@@ -365,10 +361,6 @@ async function create_reponse(){
         console.error("Erreur lors de la vérification du pseudo : " + error);
         return []; // Retourne une liste vide en cas d'erreur
     }
-    
-        // Effectuer la requête
-        
-    
 }
 
 function sommeEntierPositifEgal(max){
@@ -382,8 +374,10 @@ function sommeEntierPositifInfEg(max){
     b = Math.floor(Math.random() * (max - a) + 1);
     return a + " + " + b;
 }
+
 function sommeEntierPositirInfStr(max){
     a = Math.floor(Math.random() * max);
     b = Math.floor(Math.random() * (max - a));
     return a + " + " + b;
 }
+

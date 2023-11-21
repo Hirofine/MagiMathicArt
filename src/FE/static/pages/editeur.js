@@ -18,13 +18,21 @@ const dimY_input = document.getElementById("dimY-input");
 const valider_dimension_button = document.getElementById("validate-dimensions")
 const save_button = document.getElementById("sauvegarder-button");
 
-var pixelart;
+const ennonce_div = document.getElementById("ennonce-div");
+const av_reponse_div = document.getElementById("available-ennonce");
+const as_reponse_div = document.getElementById("associated-ennonce");
 
+
+var pixelart;
+var palette;
 var dimX;
 var dimY;
 
 var pixart = [];
 var projet_id = 0;
+var av_reponses = [];
+var as_reponses = [];
+var asso_reponse_empl = [];
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("loaded page");
@@ -99,12 +107,15 @@ async function update_page(is_connected){
             projet_id = params.get("id");
             //mode new
             if(mode == "new"){
-                palette = await update_palette_selector();
+                var palette = await update_palette_selector();
                 create_new_projet(palette);
             }
             if(mode == "edit"){
                 a = await update_palette_selector();
                 projet = await retrieve_user_projets(projet_id);
+                av_reponses = await retrieve_user_reponses();
+                as_reponses = await retrieve_asso_projet_reponse(projet_id);
+                asso_reponse_empl = await retrieve_asso_projet_palette_reponse_from_projet(projet_id);
                 display_existing(projet);
                 
             }
@@ -167,7 +178,7 @@ async function display_existing(projet){
     console.log(projet);
     projet_name_input.value = projet["nom"];
     projet_desc_input.value = projet["description"];
-    var palette = await retrieve_palette_projet(projet.id);
+    palette = await retrieve_palette_projet(projet.id);
     console.log(palette);
     palette_name_input.value = palette["id"];
     display_palette(palette);
@@ -175,6 +186,53 @@ async function display_existing(projet){
     pixelart = await retrieve_pixel_art_projet(projet.id);
     console.log(pixelart);
     display_pixelart(pixelart, palette);
+    display_available_reponses();
+    display_associated_reponses(palette);
+}
+
+function display_available_reponses(){
+    console.log("av_rep  =", av_reponses);
+    av_reponses.forEach((rep) => {
+        const div_av_rep = document.createElement("div");
+        const lab_av_rep = document.createElement("label");
+        const che_av_rep = document.createElement("input");
+        che_av_rep.setAttribute("type", "checkbox");
+        lab_av_rep.innerHTML = rep["nom"];
+        const associa = as_reponses.some((asRep) => asRep["id"] === rep["id"]);
+        if (associa){
+            che_av_rep.checked = true;
+        }
+
+        div_av_rep.appendChild(lab_av_rep);
+        div_av_rep.appendChild(che_av_rep);
+        av_reponse_div.appendChild(div_av_rep); 
+    });
+}
+
+function display_associated_reponses(palette){
+    console.log("as_rep  =", as_reponses);
+    console.log("palette : ", palette);
+    console.log("asso_empl : ", asso_reponse_empl[0]["reponse_id"]);
+    as_reponses.forEach((rep) => {
+        const div_as_rep = document.createElement("div");
+        const lab_as_rep = document.createElement("label");
+        const color_div = document.createElement("div");
+        lab_as_rep.innerHTML = rep["nom"];
+        console.log("rep en cours: ", rep);
+        var emplacement = asso_reponse_empl.find((asso) => asso["reponse_id"] === rep["id"]);
+       
+        console.log("pos : ", emplacement);
+        var color = "#FFFFFF";
+        if (emplacement != null){
+            var position = emplacement["position"];
+            color = palette["couleurs"][position]["color"];
+        }
+        color_div.style.backgroundColor = color;
+        color_div.className = "square";
+        div_as_rep.appendChild(lab_as_rep);
+        div_as_rep.appendChild(color_div);
+        as_reponse_div.appendChild(div_as_rep);
+    });
 }
 
 function load_pixel_art(pixelart, palette){
@@ -221,10 +279,16 @@ function display_pixelart_square(){
     dimX = dimX_input.value;
     dimY = dimY_input.value;
     pixelArt_div.innerHTML = "";
+    pixelArt_div.style.display = "flex";
+    pixelArt_div.style.flexDirection = "column";
     for (var x=0; x<dimX; x++){
         const line = document.createElement("div")
+        line.style.border = "0";
+        line.style.padding = "0";
+        line.style.fontSize = "0px";
         for (var y=0; y<dimY; y++){
             draw_pixel(pixart[x][y][0],x,y, line);
+
         }
         pixelArt_div.appendChild(line);
     }
@@ -661,3 +725,59 @@ function pixart_to_string(){
 
     return JSON.stringify(data);
 }
+
+function load_asso_projet_palette_reponse(){
+
+}
+
+async function retrieve_asso_projet_reponse(projet_id){
+    try {
+        const response = await fetch(api_url + `/reponses_from_projet/` + projet_id, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data["reponses"];
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
+async function retrieve_user_reponses(){
+    try {
+        const response = await fetch(api_url + `/reponse_from_user/`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data["reponses"];
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
+async function retrieve_asso_projet_palette_reponse_from_projet(projet_id){
+    try {
+        const response = await fetch(api_url + `/assoprojetpalettereponse_from_projet/` + projet_id, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data["assos"];
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
