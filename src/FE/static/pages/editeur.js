@@ -209,6 +209,19 @@ function display_available_reponses(){
             che_av_rep.checked = true;
         }
 
+        che_av_rep.onchange = (event) => {
+            console.log("selection changed");
+           // var  index = av_reponse_div.indexOf(che_av_rep);
+            if(!che_av_rep.checked){
+                var index = as_reponses.indexOf(rep);
+                as_reponses.splice(index, 1);
+            }
+            if(che_av_rep.checked){
+                as_reponses.push(rep);
+            }
+            display_associated_reponses(palette);
+        }
+
         div_av_rep.appendChild(lab_av_rep);
         div_av_rep.appendChild(che_av_rep);
         av_reponse_div.appendChild(div_av_rep); 
