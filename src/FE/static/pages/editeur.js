@@ -32,18 +32,19 @@ var pixart = [];
 var projet_id = 0;
 var av_reponses = [];
 var as_reponses = [];
+var as_pa_reponses = [];
 var asso_reponse_empl = [];
 
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("loaded page");
+    //console.log("loaded page");
     fetch(api_url + `/verify-session/`,{
         method: 'GET',
         credentials: 'include'
     })
             .then(response => response.json())
             .then(data => {
-               console.log(data);
-               console.log(data.data);
+               //console.log(data);
+               //console.log(data.data);
                is_connected = data.data;
                update_page(is_connected)
             })
@@ -71,14 +72,16 @@ save_button.addEventListener("click", async function(){
 })
 
 palette_name_input.addEventListener("change", async function(){
-    var palette = await update_palette();
-    console.log(palette);
+    palette = await update_palette();
+    //console.log(palette);
     display_palette(palette);
     display_pixelart(pixelart, palette);
+    display_available_reponses(palette);
+    display_associated_reponses(palette);
 })
 
 function resize_pixel_art(new_dimX, new_dimY){
-    console.log("resize to ", new_dimX, " by ", new_dimY);
+    //console.log("resize to ", new_dimX, " by ", new_dimY);
     var new_pix = []
     for (var x=0; x<new_dimX; x++){
         new_pix[x] = [];
@@ -107,16 +110,18 @@ async function update_page(is_connected){
             projet_id = params.get("id");
             //mode new
             if(mode == "new"){
-                var palette = await update_palette_selector();
+                palette = await update_palette_selector();
                 create_new_projet(palette);
             }
             if(mode == "edit"){
                 a = await update_palette_selector();
                 projet = await retrieve_user_projets(projet_id);
+                palette = await retrieve_palette_projet(projet.id);
                 av_reponses = await retrieve_user_reponses();
                 as_reponses = await retrieve_asso_projet_reponse(projet_id);
                 asso_reponse_empl = await retrieve_asso_projet_palette_reponse_from_projet(projet_id);
-                asso_reponse_empl.forEach((asso, i) => function(){
+                // remove ids for easier saving later on
+                asso_reponse_empl.forEach((asso, i) => {
                     asso_reponse_empl[i] = {"reponse_id": asso["reponse_id"],
                                             "position": asso["position"],
                                             "projet_id": asso["projet_id"],
@@ -129,12 +134,12 @@ async function update_page(is_connected){
         case false:
             nav_deco.style.display = "block";
             nav_co.style.display = "none";
-            console.log("case false");
+            //console.log("case false");
             break;
         default:
             nav_deco.style.display = "block";
             nav_co.style.display = "none";
-            console.log("case default");
+            //console.log("case default");
             break;
        }
 }
@@ -153,7 +158,7 @@ async function create_new_projet(palette){
 
     palette_name_input.value = palette["id"];
     p_full = await retrieve_palette_id(palette["id"])
-    console.log(p_full);
+    //console.log(p_full);
     display_palette(p_full);
 
     var new_pix = [];
@@ -181,23 +186,27 @@ async function update_palette_selector(){
 }
 
 async function display_existing(projet){
-    console.log(projet);
+    //console.log(projet);
     projet_name_input.value = projet["nom"];
     projet_desc_input.value = projet["description"];
-    palette = await retrieve_palette_projet(projet.id);
-    console.log(palette);
+    
+    //console.log(palette);
     palette_name_input.value = palette["id"];
     display_palette(palette);
-    console.log(palette);
+    //console.log(palette);
     pixelart = await retrieve_pixel_art_projet(projet.id);
-    console.log(pixelart);
+    //console.log(pixelart);
     display_pixelart(pixelart, palette);
-    display_available_reponses();
+    display_available_reponses(palette);
     display_associated_reponses(palette);
 }
 
-function display_available_reponses(){
-    console.log("av_rep  =", av_reponses);
+function display_available_reponses(palette){
+    av_reponse_div.innerHTML = "";
+    console.log("palette : ", palette);
+    console.log("av_rep  : ", av_reponses);
+    console.log("as_rep : ", as_reponses);
+    console.log("asso_rep_empl : ", asso_reponse_empl);
     av_reponses.forEach((rep) => {
         const div_av_rep = document.createElement("div");
         const lab_av_rep = document.createElement("label");
@@ -205,19 +214,39 @@ function display_available_reponses(){
         che_av_rep.setAttribute("type", "checkbox");
         lab_av_rep.innerHTML = rep["nom"];
         const associa = as_reponses.some((asRep) => asRep["id"] === rep["id"]);
+        var test = false;
         if (associa){
+            test = asso_reponse_empl.some((asRep) => asRep["reponse_id"] === rep["id"] && asRep["palette_id"] === palette["id"]);
+        }
+        console.log(rep);
+        console.log("found association : ", associa);
+        if (test){
             che_av_rep.checked = true;
+        }else{
+            che_av_rep.checked = false;
         }
 
         che_av_rep.onchange = (event) => {
-            console.log("selection changed");
+            //console.log("selection changed");
            // var  index = av_reponse_div.indexOf(che_av_rep);
             if(!che_av_rep.checked){
-                var index = as_reponses.indexOf(rep);
+                //console.log(rep);
+                var index = av_reponses.indexOf(rep);
+                //console.log("index : ", index);
+                var index_ass = asso_reponse_empl.indexOf(asso_reponse_empl.find((asso) => asso["palette_id"] === palette["id"] && asso["reponse_id"] === rep["id"]));
                 as_reponses.splice(index, 1);
+                asso_reponse_empl.splice(index_ass,1);
+                
             }
             if(che_av_rep.checked){
-                as_reponses.push(rep);
+                var index = av_reponses.indexOf(rep);
+                if (!as_reponses.find((as_rep) => as_rep["id"] === rep["id"])){
+                    as_reponses.splice(index, 0, rep);
+                }
+                asso_reponse_empl.splice(index, 0, {"projet_id": projet["id"],
+                                                    "reponse_id" : rep["id"],
+                                                    "palette_id" : palette["id"],
+                                                    "position" : -1});
             }
             display_associated_reponses(palette);
         }
@@ -229,32 +258,45 @@ function display_available_reponses(){
 }
 
 function display_associated_reponses(palette){
+    as_reponse_div.innerHTML = "";
     console.log("as_rep  =", as_reponses);
     console.log("palette : ", palette);
-    console.log("asso_empl : ", asso_reponse_empl[0]["reponse_id"]);
-    as_reponses.forEach((rep, i) => {
+    console.log("asso_empl : ", asso_reponse_empl);
+    var as_pal_asso = as_reponses.filter(element => {
+        asso_pal = asso_reponse_empl.find((asso) => (asso["reponse_id"] === element["id"] && asso["palette_id"] === palette["id"]));
+        if (asso_pal == null){
+            return false;
+        }
+        console.log("test : ", asso_pal["palette_id"] , palette["id"]);
+        return asso_pal["palette_id"] === palette["id"]; 
+    })
+    console.log(as_pal_asso);
+    as_pal_asso.forEach((rep, i) => {
         const div_as_rep = document.createElement("div");
         const lab_as_rep = document.createElement("label");
         const color_div = document.createElement("div");
         lab_as_rep.innerHTML = rep["nom"];
-        console.log("rep en cours: ", rep);
-        var emplacement = asso_reponse_empl.find((asso) => asso["reponse_id"] === rep["id"]);
-       
-        console.log("pos : ", emplacement);
+        //console.log("rep en cours: ", rep);
+        var emplacement = asso_reponse_empl.find((asso) => asso["reponse_id"] === rep["id"] && asso["palette_id"] === palette["id"]);
+        var empl_index = asso_reponse_empl.indexOf(emplacement);
+        //console.log("pos : ", emplacement);
         var color = "#FFFFFF";
         if (emplacement != null){
             var position = emplacement["position"];
-            color = palette["couleurs"][position]["color"];
+            if(position >= 0){
+                color = palette["couleurs"][position]["color"];
+            }
+            
         }
         color_div.style.backgroundColor = color;
         color_div.className = "square";
         color_div.onclick = (event) => {
             const allPaletteDisplay = document.querySelectorAll(".palette_display");
-            console.log("allpale : ", allPaletteDisplay);
+            //console.log("allpale : ", allPaletteDisplay);
             allPaletteDisplay.forEach((pal) => {
                 pal.remove();
             });
-            open_palette_selector(rep, color_div, div_as_rep, i);
+            open_palette_selector(rep, color_div, div_as_rep, empl_index, palette);
         }
         div_as_rep.appendChild(lab_as_rep);
         div_as_rep.appendChild(color_div);
@@ -262,8 +304,8 @@ function display_associated_reponses(palette){
     });
 }
 
-function open_palette_selector(rep, color_div, div_as_rep, indice){
-    console.log("truc, ", div_as_rep);
+function open_palette_selector(rep, color_div, div_as_rep, indice, palette){
+    //console.log("truc, ", div_as_rep);
     const palette_div = document.createElement("div");
     palette_div.className = "palette_display";
     colors_data = palette["couleurs"];
@@ -271,7 +313,7 @@ function open_palette_selector(rep, color_div, div_as_rep, indice){
     colors_data.forEach((col, i) => {
         colors[i] = [col.position, col.color]; 
     })
-    console.log(colors);
+    //console.log(colors);
     paletteName = palette["nom"];
     palette_div.innerHTML = "";
     colors.forEach(function(color, i){
@@ -293,7 +335,7 @@ function open_palette_selector(rep, color_div, div_as_rep, indice){
             asso_reponse_empl[indice]["position"] = parseInt(square.id.split("-")[1]);
             color_div.style.backgroundColor = colors[square.id.split("-")[1]][1];
             const allPaletteDisplay = document.querySelectorAll(".palette_display");
-            console.log("allpale : ", allPaletteDisplay);
+            //console.log("allpale : ", allPaletteDisplay);
             allPaletteDisplay.forEach((pal) => {
                 pal.remove();
             });
@@ -311,10 +353,10 @@ function load_pixel_art(pixelart, palette){
     pixelart_name_input.value = pixelart["nom"];
     pixelart_desc_input.value = pixelart["description"];
 
-    console.log(dimX, dimY);
+    //console.log(dimX, dimY);
     pixels = JSON.parse(pixelart["art"])["pixels"];
     pixart = [];
-    console.log(pixels);
+    //console.log(pixels);
     for (var x=0; x<dimX; x++){
         pixart[x] = [];
         const line = document.createElement("div")
@@ -335,7 +377,7 @@ function display_pixelart(pixelart, palette){
     
     art = JSON.parse(pixelart["art"]);
     format = art["format"];
-    console.log(format);
+    //console.log(format);
     load_pixel_art(pixelart, palette);
     if (format == "square"){
         display_pixelart_square()
@@ -359,7 +401,7 @@ function display_pixelart_square(){
         }
         pixelArt_div.appendChild(line);
     }
-    console.log(pixart);
+    //console.log(pixart);
 }
 
 function draw_pixel(color,x,y, line) {
@@ -371,9 +413,9 @@ function draw_pixel(color,x,y, line) {
     line.appendChild(pix);
     pix.onmousemove = (event) => {
         //pix.style.backgroundColor = 0;
-        console.log("mousemove");
+        //console.log("mousemove");
         if(event.buttons === 1){
-            console.log("clicked ", pix.id, " my color is ", pix.style.backgroundColor);
+            //console.log("clicked ", pix.id, " my color is ", pix.style.backgroundColor);
             change_color(x,y, pix);
         }
     }
@@ -390,7 +432,7 @@ function change_color(x,y, pix){
     y = params[2];
     pixart[x][y][0] = color.style.backgroundColor;
     pixart[x][y][1] = color.id.split("-")[1];
-    console.log("change color ", pix, color);
+    //console.log("change color ", pix, color);
 }
 
 function display_palette(palette){
@@ -399,7 +441,7 @@ function display_palette(palette){
     colors_data.forEach((col, i) => {
         colors[i] = [col.position, col.color]; 
     })
-    console.log(colors);
+    //console.log(colors);
     paletteName = palette["nom"];
     refresh_colors();
 }
@@ -538,7 +580,7 @@ async function create_projet(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'POST',
@@ -579,7 +621,7 @@ async function save_projet(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'PUT',
@@ -595,7 +637,7 @@ async function save_projet(){
     fetch(api_url + "/projets/" + projet_id, requestOptions)
         .then(response => response.json())
         .then(data => {
-            console.log('Réponse de l\'API:', data);
+            //console.log('Réponse de l\'API:', data);
         })
         .catch(error => {
             console.error('Erreur lors de la requête:', error);
@@ -603,6 +645,7 @@ async function save_projet(){
     
     save_palette();
     save_pixel_art();
+    save_association();
 }
 
 async function create_projet_palette(){
@@ -612,7 +655,7 @@ async function create_projet_palette(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'POST',
@@ -648,7 +691,7 @@ async function save_palette(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'PUT',
@@ -664,11 +707,40 @@ async function save_palette(){
     fetch(api_url + "/assoprojetpalette_from_projet/" + projet_id, requestOptions)
         .then(response => response.json())
         .then(data => {
+            //console.log('Réponse de l\'API:', data);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la requête:', error);
+        });
+}
+
+async function save_association(){
+    //console.log("----------------------------------", as_reponses);
+
+    var data = {
+        assos : asso_reponse_empl
+    }
+    console.log(JSON.stringify(data));
+    var requestOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            // Ajoutez d'autres en-têtes si nécessaire
+        },
+        body: JSON.stringify(data),
+    };
+    
+    // Effectuer la requête
+    fetch(api_url + "/assoprojetpalettereponse_collec/", requestOptions)
+        .then(response => response.json())
+        .then(data => {
             console.log('Réponse de l\'API:', data);
         })
         .catch(error => {
             console.error('Erreur lors de la requête:', error);
         });
+    //console.log(data);
 }
 
 async function create_pixel_art(){
@@ -681,7 +753,7 @@ async function create_pixel_art(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'POST',
@@ -721,7 +793,7 @@ async function save_pixel_art(){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'PUT',
@@ -737,7 +809,7 @@ async function save_pixel_art(){
     fetch(api_url + "/pixelarts_from_projet/" + projet_id, requestOptions)
         .then(response => response.json())
         .then(data => {
-            console.log('Réponse de l\'API:', data);
+            //console.log('Réponse de l\'API:', data);
         })
         .catch(error => {
             console.error('Erreur lors de la requête:', error);
@@ -751,7 +823,7 @@ async function create_asso_projet_pixelart(proj_id, pixart_id){
     };
     
 
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     // Configuration de la requête
     var requestOptions = {
         method: 'POST',
@@ -794,8 +866,9 @@ function pixart_to_string(){
 }
 
 function load_asso_projet_palette_reponse(){
-
+    //console.log("thingy");
 }
+
 
 async function retrieve_asso_projet_reponse(projet_id){
     try {

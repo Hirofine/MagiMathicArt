@@ -88,7 +88,7 @@ def rt_read_palette_full(palette_id: int, request: Request, db: Session = Depend
             coul = db.query(Couleurs).filter(Couleurs.id == asso.couleur_id).first()
             couleurs.append(CouleurPosi(color = coul.color, position = asso.position))
         
-        new_palette = PaletteCreateFull(nom = palette.nom, couleurs = couleurs)
+        new_palette = PaletteReturnFull(nom = palette.nom, couleurs = couleurs, id=palette_id)
         return new_palette
     else :
         raise HTTPException(status_code=404, detail="Palette not found")
