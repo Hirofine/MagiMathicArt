@@ -55,7 +55,9 @@ CREATE TABLE Reponses (
   nom VARCHAR(255) NOT NULL,
   description TEXT,
   ennonce TEXT,
-  fonction TEXT -- Stockez ici les fonctions ou données de réponse
+  fonction TEXT, 
+  genre TEXT
+  -- Stockez ici les fonctions ou données de réponse
   -- Autres colonnes de réponse
 );
 

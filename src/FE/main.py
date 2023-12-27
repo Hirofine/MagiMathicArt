@@ -7,7 +7,7 @@ from os import path
 app = FastAPI()
 
 # Configuration de CORS
-origins = ["https://magimathicart.hirofine.fr","https://be.magimathicart.hirofine.fr"] # permettre l'accès à partir de n'importe quelle origine
+origins = ["https://magimathicart.hirofine.fr","https://be.magimathicart.hirofine.fr", "http://localhost:8001", "http://localhost:7801"] # permettre l'accès à partir de n'importe quelle origine
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

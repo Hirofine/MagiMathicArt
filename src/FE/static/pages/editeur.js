@@ -1,4 +1,5 @@
-var api_url = "https://be.magimathicart.hirofine.fr"
+//var api_url = "https://be.magimathicart.hirofine.fr";
+var api_url = "http://localhost:8001";
 const nav_deco = document.getElementById("nav-deco");
 const nav_co = document.getElementById("nav-co");
 var palettes = [];

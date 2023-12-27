@@ -46,7 +46,7 @@ def get_login_page():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://magimathicart.hirofine.fr", "https://be.magimathicart.hirofine.fr"],
+    allow_origins=["https://magimathicart.hirofine.fr", "https://be.magimathicart.hirofine.fr", "http://localhost:8001", "http://localhost:7801"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -74,7 +74,9 @@ def rt_create_user(user: UserCreate,  request: Request, db: Session = Depends(ge
     }
 
     response = JSONResponse(content={"message": "Connexion réussie"})
-    response.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="hirofine.fr", samesite="None", path="/")
+    #response.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="hirofine.fr", samesite="None", path="/")
+    response.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="localhost", samesite="None", path="/")
+    
     print(response.raw_headers)
     
     return response
@@ -133,7 +135,8 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
             updated_user = update_user(db, user_db.id, user)
 
             response_data = JSONResponse(content={"message": "Connexion réussie", "data": True})
-            response_data.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="hirofine.fr", samesite="None", path="/")
+            #response_data.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="hirofine.fr", samesite="None", path="/")
+            response_data.set_cookie("session", cookie_content, secure=True, httponly=True, max_age=3600 * token_len_hour, domain="localhost", samesite="None", path="/")
         else :
             response_data = LoginResponse(success = False, message = "Mot de Passe invalide")
     else :
