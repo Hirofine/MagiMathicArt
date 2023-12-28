@@ -6,7 +6,7 @@ from typing import List
 from fastapi.responses import StreamingResponse
 from helper import verify_token, user_id_from_token, TOKEN_VALIDE
 from models.index import AssoProjetPaletteReponse as m_AssoProjetPaletteReponse, Users, Projets, AssoUserProjet, Palettes, AssoProjetPalette, AssoUserPalette, AssoUserReponse, Reponses, AssoProjetReponse
-from schemas.index import AssoProjetPaletteReponse, AssoProjetPaletteReponseCreate, AssoProjetPaletteReponseUpdate
+from schemas.index import AssoProjetPaletteReponse, AssoProjetPaletteReponseCreate, AssoProjetPaletteReponseUpdate, AssoProjetReponseCreate
 from crud.assoprojetpalettereponse import create_assoprojetpalettereponse, get_assoprojetpalettereponse, update_assoprojetpalettereponse, delete_assoprojetpalettereponse  # Importez les fonctions spécifiques
 from crud.assoprojetreponse import create_assoprojetreponse
 
@@ -82,6 +82,7 @@ def rt_assoprojetpalettereponse_collec(collec: AssoProjetPaletteReponseCollectio
         user_id = user_id_from_token(request, db)
         collec_d = dict(collec)
         print("collec : ", collec_d["assos"])
+        projet_from_db = db.query(Projets).filter(Projets.id == collec_d["assos"][0].projet_id).first()
         for asso in collec_d["assos"]:
             projet_from_db = db.query(Projets).filter(Projets.id == asso.projet_id).first()
             if projet_from_db == None:
@@ -122,8 +123,9 @@ def rt_assoprojetpalettereponse_collec(collec: AssoProjetPaletteReponseCollectio
             
             asso_projet_rep = db.query(AssoProjetReponse).filter((AssoProjetReponse.projet_id == asso.projet_id) & (AssoProjetReponse.reponse_id == asso.reponse_id)).first()
             if asso_projet_rep == None:
-                assoprojetreponse_data = AssoProjetReponse(projet_id = asso.projet_id, reponse_id = asso.reponse_id)
-                asso_projet_rep = create_assoprojetreponse(db, assoprojetreponse_data)
+                print("debug")
+                assoprojetreponse_data = AssoProjetReponseCreate(projet_id = asso.projet_id, reponse_id = asso.reponse_id)
+                asso_projet_rep = create_assoprojetreponse(db, dict(assoprojetreponse_data))
                 
             
             asso_projet_pal_rep = db.query(m_AssoProjetPaletteReponse).filter((m_AssoProjetPaletteReponse.projet_id == asso.projet_id) & (m_AssoProjetPaletteReponse.reponse_id == asso.reponse_id) & (m_AssoProjetPaletteReponse.palette_id == asso.palette_id)).first()

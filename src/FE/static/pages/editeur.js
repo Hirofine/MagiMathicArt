@@ -23,6 +23,8 @@ const ennonce_div = document.getElementById("ennonce-div");
 const av_reponse_div = document.getElementById("available-ennonce");
 const as_reponse_div = document.getElementById("associated-ennonce");
 
+const exp_png_btn = document.getElementById("export-png-button");
+
 
 var pixelart;
 var palette;
@@ -60,6 +62,52 @@ valider_dimension_button.addEventListener("click", function(){
     
 });
 
+exp_png_btn.addEventListener("click", async function(){
+    var imageData = await load_png_export();
+
+    console.log("imageData : ", imageData);
+    const blob = new Blob([imageData], { type: 'image/png' });
+    const imageUrl = URL.createObjectURL(blob);
+
+    const imgElement = document.createElement('img');
+    imgElement.src = imageUrl;
+
+    // Ajouter l'image à un élément existant dans votre page HTML (par exemple, un élément avec l'ID "image-container")
+    const imageContainer = document.getElementById('image-container');
+    imageContainer.appendChild(imgElement);
+
+    // Créer un lien invisible pour déclencher le téléchargement
+    const downloadLink = document.createElement("a");
+    downloadLink.href = imageUrl;
+    downloadLink.download = "nom_de_votre_image.png"; // Nom du fichier à télécharger
+    downloadLink.style.display = "none";
+
+    // Ajouter le lien à la page et déclencher le téléchargement
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink); 
+})
+
+async function load_png_export(){
+    try {    
+        const response = await fetch(api_url + `/export_png/` + projet_id, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const blob = await response.blob();
+
+        return blob;
+        //var data = await response.json();
+        //return response;
+    } catch (error) {
+        console.error("Erreur lors de la vérification du pseudo : " + error);
+        return []; // Retourne une liste vide en cas d'erreur
+    }
+}
+
 save_button.addEventListener("click", async function(){
     switch(mode){
         case "edit":
@@ -84,13 +132,13 @@ palette_name_input.addEventListener("change", async function(){
 function resize_pixel_art(new_dimX, new_dimY){
     //console.log("resize to ", new_dimX, " by ", new_dimY);
     var new_pix = []
-    for (var x=0; x<new_dimX; x++){
-        new_pix[x] = [];
-        for (var y=0; y<new_dimY; y++){
+    for (var y=0; y<new_dimY; y++){
+        new_pix[y] = [];
+        for (var x=0; x<new_dimX; x++){
             if (x < dimX && y < dimY){
-                new_pix[x][y] = pixart[x][y];
+                new_pix[y][x] = pixart[y][x];
             }else{
-                new_pix[x][y] = ["#ffffff", -1];
+                new_pix[y][x] = ["#ffffff", -1];
             }
             
         }
@@ -163,10 +211,10 @@ async function create_new_projet(palette){
     display_palette(p_full);
 
     var new_pix = [];
-    for (var x=0; x<dimX; x++){
-        new_pix[x] = [];
-        for (var y=0; y<dimY; y++){
-            new_pix[x][y] = ["#ffffff", -1];
+    for (var y=0; y<dimY; y++){
+        new_pix[y] = [];
+        for (var x=0; x<dimX; x++){
+            new_pix[y][x] = ["#ffffff", -1];
         }
     }
     pixart = new_pix;
@@ -358,18 +406,18 @@ function load_pixel_art(pixelart, palette){
     pixels = JSON.parse(pixelart["art"])["pixels"];
     pixart = [];
     //console.log(pixels);
-    for (var x=0; x<dimX; x++){
-        pixart[x] = [];
+    for (var y=0; y<dimY; y++){
+        pixart[y] = [];
         const line = document.createElement("div")
         
-        for (var y=0; y<dimY; y++){
+        for (var x=0; x<dimX; x++){
             indice = pixels[x * dimY + y][2];
             couleur = "#ffffff";
             if (indice != -1){
                 couleur = palette["couleurs"][indice].color;
             }
             
-            pixart[x][y] = [couleur, indice];
+            pixart[y][x] = [couleur, indice];
         }
     }
 }
@@ -391,13 +439,13 @@ function display_pixelart_square(){
     pixelArt_div.innerHTML = "";
     pixelArt_div.style.display = "flex";
     pixelArt_div.style.flexDirection = "column";
-    for (var x=0; x<dimX; x++){
+    for (var y=0; y<dimY; y++){
         const line = document.createElement("div")
         line.style.border = "0";
         line.style.padding = "0";
         line.style.fontSize = "0px";
-        for (var y=0; y<dimY; y++){
-            draw_pixel(pixart[x][y][0],x,y, line);
+        for (var x=0; x<dimX; x++){
+            draw_pixel(pixart[y][x][0],x,y, line);
 
         }
         pixelArt_div.appendChild(line);
@@ -431,8 +479,8 @@ function change_color(x,y, pix){
     params = pix.id.split("-");
     x = params[1];
     y = params[2];
-    pixart[x][y][0] = color.style.backgroundColor;
-    pixart[x][y][1] = color.id.split("-")[1];
+    pixart[y][x][0] = color.style.backgroundColor;
+    pixart[y][x][1] = color.id.split("-")[1];
     //console.log("change color ", pix, color);
 }
 
@@ -852,10 +900,10 @@ async function create_asso_projet_pixelart(proj_id, pixart_id){
 
 function pixart_to_string(){
     pix = [];
-    for(var x=0; x<dimX; x++){
+    for(var y=0; y<dimY; y++){
     
-        for (var y=0; y<dimY; y++){
-            pix[x*dimY + y] = [x, y, pixart[x][y][1]];
+        for (var x=0; x<dimX; x++){
+            pix[x*dimY + y] = [x, y, pixart[y][x][1]];
         }
     }
     data = {
