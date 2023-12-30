@@ -3,7 +3,7 @@ from sqlalchemy import text, or_
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Request
 from fastapi.responses import StreamingResponse, FileResponse
 from helper import verify_token, user_id_from_token, TOKEN_VALIDE
-from models.index import PixelArts, AssoUserProjet, AssoProjetPixelArt, AssoUserPixelArt, AssoProjetPalette, Palettes, AssoPaletteCouleur, Couleurs
+from models.index import PixelArts, AssoUserProjet, AssoProjetPixelArt, AssoUserPixelArt, AssoProjetPalette, Palettes, AssoPaletteCouleur, Couleurs, AssoProjetPaletteReponse, Reponses
 from schemas.index import PixelArt, PixelArtCreate, PixelArtUpdate, AssoUserPixelArtCreate
 from crud.pixelarts import create_pixelart, get_pixelart, update_pixelart, delete_pixelart  # Importez les fonctions spécifiques
 from crud.projets import get_projet
@@ -11,6 +11,7 @@ from crud.assouserpixelart import create_assouserpixelart
 from PIL import Image, ImageDraw, ImageFont
 import json
 import matplotlib.pyplot as plt
+import random
 
 pixelart = APIRouter()
 
@@ -243,6 +244,10 @@ def rt_export_png_compile_pixelart(projet_id: int, request: Request, db: Session
         assoprojpal = db.query(AssoProjetPalette).filter(projet_id == AssoProjetPalette.projet_id).first()
         palette = db.query(Palettes).filter(assoprojpal.palette_id == Palettes.id).first()
         assopalcoul = db.query(AssoPaletteCouleur).filter(palette.id == AssoPaletteCouleur.palette_id).all()
+        assoprojpalrep = db.query(AssoProjetPaletteReponse).filter((projet_id == AssoProjetPaletteReponse.projet_id) and (palette_id == AssoProjetPaletteReponse.palette_id)).all()
+        reponses = []
+        for asso in assoprojpalrep:
+            reponses.append(db.query(Reponses).filter(asso.reponse_id == Reponses.id).first())
 
         couleurs = []
         for asso in assopalcoul:
@@ -290,32 +295,52 @@ def rt_export_png_compile_pixelart(projet_id: int, request: Request, db: Session
         # Sauvegardez l'image en format PNG
         image.save("static/temp/pixel_art.png", "PNG")
 
-        nb_cases_x, nb_cases_y = 5, 5  # Nombre de cases en largeur et hauteur
+        nb_cases_x, nb_cases_y = pixelArt.dimensionsX, pixelArt.dimensionsY  # Nombre de cases en largeur et hauteur
+        fig_largeur = nb_cases_x
+        fig_hauteur = nb_cases_y  # Taille de la figure en pouces
 
+        # Création d'une figure Matplotlib avec une taille spécifique
+        fig, ax = plt.subplots(figsize=(fig_largeur, fig_hauteur))
+        # Ajuster les marges autour du graphique
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         # Création d'une figure Matplotlib
-        fig, ax = plt.subplots()
-        ax.axis('on')
-        ax.plot([-1, -1], [-1, nb_cases_y], color='black')
-        ax.plot([-1, nb_cases_x], [-1, -1], color='black')
+        #fig, ax = plt.subplots()
+        ax.axis('off')
+        ax.plot([-1, -1], [-1, nb_cases_y - 1], color='black')
+        ax.plot([-1, nb_cases_x - 1], [-1, -1], color='black')
         # Dessiner la grille de cases et placer du texte LaTeX
-        for i in range(nb_cases_x + 1):
+        for i in range(nb_cases_x):
             # Dessiner les lignes verticales
-            ax.plot([i, i], [-1, nb_cases_y], color='black')
-            for j in range(nb_cases_y + 1):
+            ax.plot([i, i], [-1, nb_cases_y - 1], color='black')
+            for j in range(nb_cases_y):
                 # Dessiner les lignes horizontales
-                ax.plot([-1, nb_cases_x], [j, j], color='black')
+                if (i == 0):
+                    ax.plot([-1, nb_cases_x - 1], [j, j], color='black')
 
                 # Coordonnées de chaque case
                 x, y = i - 0.5, j - 0.5
                 
-                # Placer du texte LaTeX dans chaque case
-                texte_latex = r'$\frac{1}{' + str(i) + ',' + str(j) + '}$'  # Exemple de texte LaTeX avec fractions
+                # determiner si il existe une réponse pour cette case
+                if len(reponses) > 0:
+                    if reponses[0].genre == "fonct":
+                        # Placer du texte LaTeX dans chaque case
+                        params = reponses[0].fonction.split('&')
+                        nom_fonction = params[0]
+                        value = params[1]
+                        print(value)
 
-                ax.text(x, y, texte_latex, ha='center', va='center', fontsize=12)
+                        if nom_fonction in globals() and callable(globals()[nom_fonction]):
+                            fonction = globals()[nom_fonction]
+                            texte_latex = fonction(int(value))  # Exécute la fonction dont le nom est dans la variable 'nom_fonction'
+                            ax.text(x, y, texte_latex, ha='center', va='center', fontsize=12)
+                        else:
+                            print("La fonction spécifiée n'existe pas ou n'est pas callable.")
+                         
 
         # Ajuster les limites pour afficher correctement la grille
-        ax.set_xlim(-1.5, nb_cases_x + 0.5)
-        ax.set_ylim(-1.5, nb_cases_y + 0.5)
+        ax.set_xlim(-1.5, nb_cases_x - 0.5)
+        ax.set_ylim(-1.5, nb_cases_y - 0.5)
+        ax.set_aspect('equal')
 
         # Enregistrer l'image ou l'afficher
         plt.savefig('image_tex.png')
@@ -326,3 +351,19 @@ def rt_export_png_compile_pixelart(projet_id: int, request: Request, db: Session
     raise HTTPException(status_code=404, detail="Erreur lors de la verification de la connexion")
 
 # Vous pouvez ajouter d'autres routes liées aux utilisateurs au besoin
+
+
+def fonct_soenpoeg(maximum):
+    a = random.randint(1, maximum - 1)
+    b = maximum - a
+    return r'$' + str(a) + '+' + str(b) + '$'
+
+def fonct_soenpoineg(maximum):
+    a = random.randint(1, maximum - 2)
+    b = random.randint(1, maximum - a)
+    return str(a) + " + " + str(b)
+
+def fonct_soenpoinst(maximum):
+    a = random.randint(1, maximum - 2)
+    b = random.randint(1, maximum - a - 1)
+    return r'$' + str(a) + '+' + str(b) + '$'

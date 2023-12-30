@@ -262,13 +262,13 @@ async function save_reponse(){
         switch(fonct_select.value){
             
             case "fonct-soenpoeg":
-                fonction = "fonct-soenpoeg&" + fct_par_max_input.value;
+                fonction = "fonct_soenpoeg&" + fct_par_max_input.value;
                 break;
             case "fonct-soenpoineg":
-                fonction = "fonct-soenpoineg" + fct_par_max_input.value;
+                fonction = "fonct_soenpoineg" + fct_par_max_input.value;
                 break;
             case "fonct-soenpoinst":
-                fonction = "fonct-soenpoinst" + fct_par_max_input.value;
+                fonction = "fonct_soenpoinst" + fct_par_max_input.value;
                 break;
             default:
                 break;
@@ -312,13 +312,13 @@ async function create_reponse(){
     if(genre_select.value == "fonct"){
         switch(fonct_select.value){
             case "fonct-soenpoeg":
-                fonction = "fonct-soenpoeg&" + fct_par_max_input.value;
+                fonction = "fonct_soenpoeg&" + fct_par_max_input.value;
                 break;
             case "fonct-soenpoineg":
-                fonction = "fonct-soenpoineg" + fct_par_max_input.value;
+                fonction = "fonct_soenpoineg" + fct_par_max_input.value;
                 break;
             case "fonct-soenpoinst":
-                fonction = "fonct-soenpoinst" + fct_par_max_input.value;
+                fonction = "fonct_soenpoinst" + fct_par_max_input.value;
                 break;
             default:
                 break;
